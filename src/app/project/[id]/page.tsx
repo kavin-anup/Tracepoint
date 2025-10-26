@@ -285,25 +285,25 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
       {/* Content */}
       <div className="relative z-10">
         <div className="backdrop-blur-md bg-white/5 border-b border-white/10 shadow-lg">
-          <div className="max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div className="flex items-center gap-3">
+          <div className="max-w-[98%] mx-auto px-2 sm:px-4 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 sm:py-6 gap-3 sm:gap-0">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <img 
                   src="/logo.png" 
                   alt="Tracepoint Logo" 
-                  className="w-20 h-20"
+                  className="w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20"
                 />
                 <div>
-                  <h1 className="text-3xl font-bold text-white">{project.name}</h1>
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">{project.name}</h1>
                   {project.description && (
-                    <p className="text-gray-300 mt-1">{project.description}</p>
+                    <p className="text-xs sm:text-sm text-gray-300 mt-1">{project.description}</p>
                   )}
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center w-full sm:w-auto gap-2">
                 <button
                   onClick={handleCopyLink}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all shadow-lg ${
+                  className={`flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all shadow-lg text-sm sm:text-base ${
                     copyLinkSuccess 
                       ? 'bg-green-600 text-white' 
                       : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
@@ -311,14 +311,14 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                 >
                   {copyLinkSuccess ? (
                     <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>Link Copied!</span>
+                      <span>Copied!</span>
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
                       <span>Copy Link</span>
@@ -327,7 +327,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                 </button>
                 <button
                   onClick={() => setShowBugForm(true)}
-                  className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg"
+                  className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base"
                 >
                   Add Bug
                 </button>
@@ -336,13 +336,13 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
           </div>
         </div>
 
-      <div className="max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[98%] mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
         {/* Two Column Layout: Project Details + Current Status */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
           {/* Project Details Section */}
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-6">
+          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-white">Project Details</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-white">Project Details</h2>
               {!isEditingDetails ? (
                 <button
                   onClick={() => {
@@ -353,7 +353,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                     setEditedDescription(project?.description || '')
                     setIsEditingDetails(true)
                   }}
-                  className="text-[#1e316d] bg-white/90 hover:bg-white px-3 py-1.5 rounded font-medium transition-colors"
+                  className="text-xs sm:text-sm text-[#1e316d] bg-white/90 hover:bg-white px-2 sm:px-3 py-1 sm:py-1.5 rounded font-medium transition-colors"
                 >
                   Edit
                 </button>
@@ -361,7 +361,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                 <div className="space-x-2">
                   <button
                     onClick={handleSaveProjectDetails}
-                    className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg"
+                    className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors shadow-lg text-sm"
                   >
                     Save
                   </button>
@@ -372,7 +372,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                       setEditedDescription(project.description || '')
                       setIsEditingDetails(false)
                     }}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-lg font-medium transition-colors"
+                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm"
                   >
                     Cancel
                   </button>
@@ -426,28 +426,28 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
           </div>
 
           {/* Current Status Section */}
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-6">
-            <h2 className="text-xl font-semibold text-white mb-4">Current Status</h2>
+          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Current Status</h2>
             <div className="space-y-3">
               <div className="flex justify-between items-center py-2 border-b border-white/20">
-                <span className="text-gray-300 font-medium">Total Bugs:</span>
-                <span className="text-2xl font-bold text-white">{bugs.length}</span>
+                <span className="text-sm sm:text-base text-gray-300 font-medium">Total Bugs:</span>
+                <span className="text-xl sm:text-2xl font-bold text-white">{bugs.length}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-white/20">
-                <span className="text-gray-300 font-medium">Open Bugs:</span>
-                <span className="text-2xl font-bold text-red-400">
+                <span className="text-sm sm:text-base text-gray-300 font-medium">Open Bugs:</span>
+                <span className="text-xl sm:text-2xl font-bold text-red-400">
                   {bugs.filter(bug => bug.status.toLowerCase() === 'open' || bug.status.toLowerCase() === 'reopened').length}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-white/20">
-                <span className="text-gray-300 font-medium">Closed Bugs:</span>
-                <span className="text-2xl font-bold text-green-400">
+                <span className="text-sm sm:text-base text-gray-300 font-medium">Closed Bugs:</span>
+                <span className="text-xl sm:text-2xl font-bold text-green-400">
                   {bugs.filter(bug => bug.status.toLowerCase() === 'closed').length}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2">
-                <span className="text-gray-300 font-medium">Out of Scope Bugs:</span>
-                <span className="text-2xl font-bold text-gray-400">
+                <span className="text-sm sm:text-base text-gray-300 font-medium">Out of Scope:</span>
+                <span className="text-xl sm:text-2xl font-bold text-gray-400">
                   {bugs.filter(bug => bug.status.toLowerCase() === 'out of scope').length}
                 </span>
               </div>
@@ -475,9 +475,9 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
         {/* Filter Section */}
         {bugs.length > 0 && (
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-6 mb-6">
+          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white">Filter Bugs</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-white">Filter Bugs</h3>
               {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all') && (
                 <button
                   onClick={() => {
@@ -486,30 +486,30 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                     setFilterPriority('all')
                     setFilterAssignedTo('all')
                   }}
-                  className="text-sm text-gray-400 hover:text-white transition-colors"
+                  className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors"
                 >
-                  Clear Filters
+                  Clear
                 </button>
               )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {/* Portal Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Portal</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Portal</label>
                 <select
                   value={filterPortal}
                   onChange={(e) => setFilterPortal(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer"
+                  className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-sm"
                   style={{
                     colorScheme: 'dark'
                   }}
                 >
-                  <option value="all" className="bg-gray-900 text-white hover:bg-[#1e316d] py-2">All Portals</option>
+                  <option value="all" className="bg-gray-900 text-white">All</option>
                   {allPortalOptions.map(portal => (
                     <option 
                       key={portal} 
                       value={portal} 
-                      className="bg-gray-900 text-white hover:bg-[#1e316d] py-2"
+                      className="bg-gray-900 text-white"
                     >
                       {portal}
                     </option>
@@ -519,21 +519,21 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
               {/* Status Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Status</label>
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer"
+                  className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-sm"
                   style={{
                     colorScheme: 'dark'
                   }}
                 >
-                  <option value="all" className="bg-gray-900 text-white hover:bg-[#1e316d] py-2">All Statuses</option>
+                  <option value="all" className="bg-gray-900 text-white">All</option>
                   {allStatusOptions.map(status => (
                     <option 
                       key={status} 
                       value={status} 
-                      className="bg-gray-900 text-white hover:bg-[#1e316d] py-2"
+                      className="bg-gray-900 text-white"
                     >
                       {status}
                     </option>
@@ -543,21 +543,21 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
               {/* Priority Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Priority</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Priority</label>
                 <select
                   value={filterPriority}
                   onChange={(e) => setFilterPriority(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer"
+                  className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-sm"
                   style={{
                     colorScheme: 'dark'
                   }}
                 >
-                  <option value="all" className="bg-gray-900 text-white hover:bg-[#1e316d] py-2">All Priorities</option>
+                  <option value="all" className="bg-gray-900 text-white">All</option>
                   {allPriorityOptions.map(priority => (
                     <option 
                       key={priority} 
                       value={priority} 
-                      className="bg-gray-900 text-white hover:bg-[#1e316d] py-2"
+                      className="bg-gray-900 text-white"
                     >
                       {priority}
                     </option>
@@ -567,21 +567,21 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
               {/* Assigned To Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Assigned To</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Assigned To</label>
                 <select
                   value={filterAssignedTo}
                   onChange={(e) => setFilterAssignedTo(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer"
+                  className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-sm"
                   style={{
                     colorScheme: 'dark'
                   }}
                 >
-                  <option value="all" className="bg-gray-900 text-white hover:bg-[#1e316d] py-2">All Assignees</option>
+                  <option value="all" className="bg-gray-900 text-white">All</option>
                   {allAssignedToOptions.map(assignedTo => (
                     <option 
                       key={assignedTo} 
                       value={assignedTo} 
-                      className="bg-gray-900 text-white hover:bg-[#1e316d] py-2"
+                      className="bg-gray-900 text-white"
                     >
                       {assignedTo}
                     </option>
@@ -590,205 +590,304 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
               </div>
             </div>
             {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all') && (
-              <div className="mt-4 text-sm text-gray-400">
+              <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-400">
                 Showing {filteredBugs.length} of {bugs.length} bugs
               </div>
             )}
           </div>
         )}
 
-        {/* Bug Table */}
+        {/* Bug Display - Responsive: Cards on Mobile, Table on Desktop */}
         {bugs.length === 0 ? (
           <div className="text-center py-12 backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20">
-            <div className="text-gray-300 text-lg mb-4">No bugs reported yet</div>
+            <div className="text-gray-300 text-base sm:text-lg mb-4">No bugs reported yet</div>
             <button
               onClick={() => setShowBugForm(true)}
-              className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg"
+              className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base"
             >
               Report First Bug
             </button>
           </div>
         ) : (
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 overflow-hidden">
-            <table className="w-full divide-y divide-white/20 table-fixed">
-              <thead className="bg-white/5">
-                <tr>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '7%'}}>
-                    Bug ID
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '8%'}}>
-                    Portal
-                  </th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '7%'}}>
-                    Priority
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '12%'}}>
-                    Module / Feature
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '15%'}}>
-                    Bug Description
-                  </th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '9%'}}>
-                    Status
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '8%'}}>
-                    Assigned To
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '6%'}}>
-                    Bug Link
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '12%'}}>
-                    Client Notes
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '12%'}}>
-                    Developer Notes
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '8%'}}>
-                    Date Added
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '9%'}}>
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-transparent divide-y divide-white/10">
-                {filteredBugs.length === 0 ? (
-                  <tr>
-                    <td colSpan={12} className="px-3 py-8 text-center">
-                      <div className="text-gray-400 text-lg mb-2">No bugs match the selected filters</div>
-                      <button
-                        onClick={() => {
-                          setFilterPortal('all')
-                          setFilterStatus('all')
-                          setFilterPriority('all')
-                          setFilterAssignedTo('all')
-                        }}
-                        className="text-[#1e316d] bg-white/90 hover:bg-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-                      >
-                        Clear Filters
-                      </button>
-                    </td>
-                  </tr>
-                ) : filteredBugs.map((bug) => (
-                  <tr 
-                    key={bug.id} 
-                    className="hover:bg-white/5 cursor-pointer transition-colors"
-                    onClick={() => setViewingBug(bug)}
+          <>
+            {/* Mobile Card View (hidden on lg+) */}
+            <div className="space-y-4 lg:hidden">
+              {filteredBugs.length === 0 ? (
+                <div className="text-center py-8 backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20">
+                  <div className="text-gray-400 text-base mb-2">No bugs match the filters</div>
+                  <button
+                    onClick={() => {
+                      setFilterPortal('all')
+                      setFilterStatus('all')
+                      setFilterPriority('all')
+                      setFilterAssignedTo('all')
+                    }}
+                    className="text-[#1e316d] bg-white/90 hover:bg-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                   >
-                    <td className="px-3 py-3 text-sm font-medium text-white">
-                      <div className="break-words">{bug.bug_id}</div>
-                    </td>
-                    <td className="px-3 py-3 text-sm text-white">
-                      <div className="break-words">{bug.portal}</div>
-                    </td>
-                    <td className="px-3 py-3 text-center">
-                      <span className={`inline-flex items-center justify-center text-center px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(bug.priority)}`}>
-                        {bug.priority}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3 text-sm text-white">
-                      <div className="break-words line-clamp-2">
-                        {bug.module_feature || '-'}
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-300">
-                      <div className="break-words line-clamp-3">
-                        {bug.bug_description || '-'}
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 text-center">
-                      <span className={`inline-flex items-center justify-center text-center px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(bug.status)}`}>
+                    Clear Filters
+                  </button>
+                </div>
+              ) : filteredBugs.map((bug) => (
+                <div
+                  key={bug.id}
+                  className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4"
+                  onClick={() => setViewingBug(bug)}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="text-base font-semibold text-white mb-1">{bug.bug_id}</div>
+                      <div className="text-sm text-gray-300">{bug.portal}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(bug.status)}`}>
                         {bug.status}
                       </span>
-                    </td>
-                    <td className="px-3 py-3 text-sm text-white">
-                      <div className="break-words">{bug.assigned_to}</div>
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-300">
-                      {bug.bug_link ? (
+                      <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(bug.priority)}`}>
+                        {bug.priority}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    {bug.module_feature && (
+                      <div>
+                        <span className="text-xs text-gray-400 font-medium">Module:</span>
+                        <div className="text-sm text-white">{bug.module_feature}</div>
+                      </div>
+                    )}
+                    {bug.bug_description && (
+                      <div>
+                        <span className="text-xs text-gray-400 font-medium">Description:</span>
+                        <div className="text-sm text-gray-300 line-clamp-2">{bug.bug_description}</div>
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-400">
+                      Assigned to: <span className="text-white">{bug.assigned_to}</span>
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      Date: <span className="text-white">{formatDate(bug.date_added)}</span>
+                    </div>
+                    {bug.bug_link && (
+                      <div>
                         <a 
                           href={bug.bug_link} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-blue-400 hover:text-blue-300 underline"
+                          className="text-xs text-blue-400 hover:text-blue-300 underline"
                         >
-                          Link
+                          View Link
                         </a>
-                      ) : '-'}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-300">
-                      <div className="break-words line-clamp-2">
-                        {bug.client_notes || '-'}
                       </div>
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-300">
-                      <div className="break-words line-clamp-2">
-                        {bug.developer_notes || '-'}
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-300">
-                      <div className="break-words">{formatDate(bug.date_added)}</div>
-                    </td>
-                    <td className="px-3 py-3 text-sm font-medium">
-                      <div className="flex flex-col space-y-1">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setEditingBug(bug)
-                          }}
-                          className="text-blue-400 hover:text-blue-300 text-left"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteBug(bug.id)
-                          }}
-                          className="text-red-400 hover:text-red-300 text-left"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2 pt-3 border-t border-white/20">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditingBug(bug)
+                      }}
+                      className="flex-1 text-blue-400 hover:bg-blue-400/10 border border-blue-400/20 py-2 rounded font-medium text-sm transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteBug(bug.id)
+                      }}
+                      className="flex-1 text-red-400 hover:bg-red-400/10 border border-red-400/20 py-2 rounded font-medium text-sm transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (hidden on mobile) */}
+            <div className="hidden lg:block backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 overflow-x-auto">
+              <table className="w-full divide-y divide-white/20 table-fixed">
+                <thead className="bg-white/5">
+                  <tr>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '7%'}}>
+                      Bug ID
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '8%'}}>
+                      Portal
+                    </th>
+                    <th className="px-3 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '7%'}}>
+                      Priority
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '12%'}}>
+                      Module / Feature
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '15%'}}>
+                      Bug Description
+                    </th>
+                    <th className="px-3 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '9%'}}>
+                      Status
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '8%'}}>
+                      Assigned To
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '6%'}}>
+                      Bug Link
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '12%'}}>
+                      Client Notes
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '12%'}}>
+                      Developer Notes
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '8%'}}>
+                      Date Added
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" style={{width: '9%'}}>
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="bg-transparent divide-y divide-white/10">
+                  {filteredBugs.length === 0 ? (
+                    <tr>
+                      <td colSpan={12} className="px-3 py-8 text-center">
+                        <div className="text-gray-400 text-lg mb-2">No bugs match the selected filters</div>
+                        <button
+                          onClick={() => {
+                            setFilterPortal('all')
+                            setFilterStatus('all')
+                            setFilterPriority('all')
+                            setFilterAssignedTo('all')
+                          }}
+                          className="text-[#1e316d] bg-white/90 hover:bg-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                        >
+                          Clear Filters
+                        </button>
+                      </td>
+                    </tr>
+                  ) : filteredBugs.map((bug) => (
+                    <tr 
+                      key={bug.id} 
+                      className="hover:bg-white/5 cursor-pointer transition-colors"
+                      onClick={() => setViewingBug(bug)}
+                    >
+                      <td className="px-3 py-3 text-sm font-medium text-white">
+                        <div className="break-words">{bug.bug_id}</div>
+                      </td>
+                      <td className="px-3 py-3 text-sm text-white">
+                        <div className="break-words">{bug.portal}</div>
+                      </td>
+                      <td className="px-3 py-3 text-center">
+                        <span className={`inline-flex items-center justify-center text-center px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(bug.priority)}`}>
+                          {bug.priority}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3 text-sm text-white">
+                        <div className="break-words line-clamp-2">
+                          {bug.module_feature || '-'}
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-sm text-gray-300">
+                        <div className="break-words line-clamp-3">
+                          {bug.bug_description || '-'}
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-center">
+                        <span className={`inline-flex items-center justify-center text-center px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(bug.status)}`}>
+                          {bug.status}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3 text-sm text-white">
+                        <div className="break-words">{bug.assigned_to}</div>
+                      </td>
+                      <td className="px-3 py-3 text-sm text-gray-300">
+                        {bug.bug_link ? (
+                          <a 
+                            href={bug.bug_link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-blue-400 hover:text-blue-300 underline"
+                          >
+                            Link
+                          </a>
+                        ) : '-'}
+                      </td>
+                      <td className="px-3 py-3 text-sm text-gray-300">
+                        <div className="break-words line-clamp-2">
+                          {bug.client_notes || '-'}
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-sm text-gray-300">
+                        <div className="break-words line-clamp-2">
+                          {bug.developer_notes || '-'}
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-sm text-gray-300">
+                        <div className="break-words">{formatDate(bug.date_added)}</div>
+                      </td>
+                      <td className="px-3 py-3 text-sm font-medium">
+                        <div className="flex flex-col space-y-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setEditingBug(bug)
+                            }}
+                            className="text-blue-400 hover:text-blue-300 text-left"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteBug(bug.id)
+                            }}
+                            className="text-red-400 hover:text-red-300 text-left"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {/* Bug Details Popup */}
         {viewingBug && (
           <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 max-w-4xl w-full max-h-[90vh] flex flex-col">
-              <div className="flex justify-between items-start p-6 border-b border-white/20 flex-shrink-0">
-                <h2 className="text-2xl font-semibold text-white">Bug Details</h2>
+              <div className="flex justify-between items-start p-4 sm:p-6 border-b border-white/20 flex-shrink-0">
+                <h2 className="text-xl sm:text-2xl font-semibold text-white">Bug Details</h2>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => {
                       setViewingBug(null)
                       setEditingBug(viewingBug)
                     }}
-                    className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg"
+                    className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => setViewingBug(null)}
-                    className="text-gray-400 hover:text-white text-2xl leading-none"
+                    className="text-gray-400 hover:text-white text-xl sm:text-2xl leading-none"
                   >
                     ×
                   </button>
                 </div>
               </div>
 
-              <div className="space-y-4 p-6 overflow-y-auto flex-grow">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4 p-4 sm:p-6 overflow-y-auto flex-grow">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1">Bug ID</label>
-                    <div className="text-white font-semibold text-lg">{viewingBug.bug_id}</div>
+                    <div className="text-white font-semibold text-base sm:text-lg">{viewingBug.bug_id}</div>
                   </div>
 
                   <div>
@@ -798,14 +897,14 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1">Priority</label>
-                    <span className={`inline-flex items-center justify-center text-center px-3 py-1 text-sm font-semibold rounded-full ${getPriorityColor(viewingBug.priority)}`}>
+                    <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${getPriorityColor(viewingBug.priority)}`}>
                       {viewingBug.priority}
                     </span>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
-                    <span className={`inline-flex items-center justify-center text-center px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(viewingBug.status)}`}>
+                    <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${getStatusColor(viewingBug.status)}`}>
                       {viewingBug.status}
                     </span>
                   </div>
@@ -823,14 +922,14 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Module / Feature</label>
-                  <div className="text-white bg-white/5 p-3 rounded border border-white/20">
+                  <div className="text-white bg-white/5 p-3 rounded border border-white/20 text-sm sm:text-base">
                     {viewingBug.module_feature || '-'}
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Bug Description</label>
-                  <div className="text-white bg-white/5 p-3 rounded border border-white/20 whitespace-pre-wrap">
+                  <div className="text-white bg-white/5 p-3 rounded border border-white/20 whitespace-pre-wrap text-sm sm:text-base">
                     {viewingBug.bug_description || '-'}
                   </div>
                 </div>
@@ -842,7 +941,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                       href={viewingBug.bug_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 underline break-all"
+                      className="text-blue-400 hover:text-blue-300 underline break-all text-sm sm:text-base"
                     >
                       {viewingBug.bug_link}
                     </a>
@@ -852,7 +951,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                 {viewingBug.client_notes && (
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1">Client Notes</label>
-                    <div className="text-white bg-blue-900/30 p-3 rounded border border-blue-500/30 whitespace-pre-wrap">
+                    <div className="text-white bg-blue-900/30 p-3 rounded border border-blue-500/30 whitespace-pre-wrap text-sm sm:text-base">
                       {viewingBug.client_notes}
                     </div>
                   </div>
@@ -861,14 +960,14 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                 {viewingBug.developer_notes && (
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1">Developer Notes</label>
-                    <div className="text-white bg-green-900/30 p-3 rounded border border-green-500/30 whitespace-pre-wrap">
+                    <div className="text-white bg-green-900/30 p-3 rounded border border-green-500/30 whitespace-pre-wrap text-sm sm:text-base">
                       {viewingBug.developer_notes}
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="flex justify-end space-x-3 p-6 border-t border-white/20 flex-shrink-0">
+              <div className="flex justify-end space-x-3 p-4 sm:p-6 border-t border-white/20 flex-shrink-0">
                 <button
                   onClick={() => {
                     if (confirm('Are you sure you want to delete this bug?')) {
@@ -876,13 +975,13 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                       setViewingBug(null)
                     }
                   }}
-                  className="px-4 py-2 text-red-400 hover:text-red-300 font-medium"
+                  className="px-3 sm:px-4 py-2 text-red-400 hover:text-red-300 font-medium text-sm sm:text-base"
                 >
                   Delete Bug
                 </button>
                 <button
                   onClick={() => setViewingBug(null)}
-                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg font-medium transition-colors"
+                  className="px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg font-medium transition-colors text-sm sm:text-base"
                 >
                   Close
                 </button>

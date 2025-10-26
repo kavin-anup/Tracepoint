@@ -208,25 +208,25 @@ export default function Home() {
         {/* Header with glassmorphism */}
         <div className="backdrop-blur-md bg-white/5 border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 sm:py-6 gap-4">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <img 
                   src="/logo.png" 
                   alt="Tracepoint Logo" 
-                  className="w-20 h-20"
+                  className="w-12 h-12 sm:w-20 sm:h-20"
                 />
-                <h1 className="text-3xl font-bold text-white">Tracepoint</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">Tracepoint</h1>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <button
                   onClick={() => setShowProjectForm(true)}
-                  className="backdrop-blur-md bg-[#1e316d]/80 hover:bg-[#2a4494]/80 border border-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-lg"
+                  className="flex-1 sm:flex-none backdrop-blur-md bg-[#1e316d]/80 hover:bg-[#2a4494]/80 border border-white/20 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-all shadow-lg text-sm sm:text-base"
                 >
                   New Project
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="backdrop-blur-md bg-red-600/80 hover:bg-red-700/80 border border-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-lg"
+                  className="flex-1 sm:flex-none backdrop-blur-md bg-red-600/80 hover:bg-red-700/80 border border-white/20 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-all shadow-lg text-sm sm:text-base"
                 >
                   Logout
                 </button>
