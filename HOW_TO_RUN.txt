@@ -1,0 +1,56 @@
+====================================
+HOW TO RUN THE BUG TRACKER
+====================================
+
+IMPORTANT: You MUST be in the bug-tracker directory!
+
+METHOD 1 (EASIEST):
+-------------------
+1. Navigate to: C:\Users\work\Desktop\Trace Point\bug-tracker
+2. Double-click the file: START_HERE.bat
+3. Wait for "Ready in X.Xs" message
+4. Open browser to: http://localhost:3000
+
+METHOD 2 (PowerShell):
+----------------------
+1. Open PowerShell
+2. Copy and paste this EXACT command:
+   
+   cd "C:\Users\work\Desktop\Trace Point\bug-tracker"; npm run dev
+
+3. Press Enter
+4. Wait for "Ready in X.Xs" message
+5. Open browser to: http://localhost:3000
+
+METHOD 3 (Manual):
+------------------
+1. Open PowerShell
+2. Run: cd "C:\Users\work\Desktop\Trace Point\bug-tracker"
+3. Verify you're in the right place: pwd
+   (Should show: C:\Users\work\Desktop\Trace Point\bug-tracker)
+4. Run: npm run dev
+5. Wait for "Ready in X.Xs" message
+6. Open browser to: http://localhost:3000
+
+COMMON MISTAKES:
+----------------
+❌ Running "npm run dev" from: C:\Users\work\Desktop\Trace Point
+   (This is the WRONG directory - you'll get "Missing script: dev" error)
+
+✅ Running "npm run dev" from: C:\Users\work\Desktop\Trace Point\bug-tracker
+   (This is the CORRECT directory)
+
+TROUBLESHOOTING:
+----------------
+If you see "Missing script: dev" error:
+- You are in the WRONG directory
+- Use: cd "C:\Users\work\Desktop\Trace Point\bug-tracker"
+- Then try again
+
+If browser shows "Unable to connect":
+- The server is NOT running
+- Follow METHOD 1 above
+- Make sure you see "Ready in X.Xs" before opening browser
+
+====================================
+

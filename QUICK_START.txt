@@ -1,0 +1,164 @@
+========================================
+QUICK START GUIDE - Bug Tracker V2
+========================================
+
+🚀 NEW FEATURES:
+- Projects open in separate windows
+- Auto-generated Bug IDs (TP-1, TP-2, TP-3...)
+- Project Details rich text editor
+- 11 comprehensive bug tracking fields
+- Enhanced dropdowns for better organization
+
+⚠️ IMPORTANT: UPDATE YOUR DATABASE FIRST!
+Before using the new features, you MUST update your Supabase database.
+
+========================================
+STEP 1: UPDATE DATABASE (REQUIRED!)
+========================================
+
+1. Go to https://supabase.com
+2. Open your project dashboard
+3. Click "SQL Editor" in the left menu
+4. Open the file: supabase-schema-v2.sql
+5. Copy ALL the SQL code
+6. Paste it into the SQL Editor
+7. Click "Run" button
+8. Wait for "Success" message
+
+For detailed instructions, see: UPDATE_DATABASE.md
+
+========================================
+STEP 2: START THE SERVER
+========================================
+
+METHOD 1 (Easiest):
+   Double-click: START_HERE.bat
+
+METHOD 2 (PowerShell):
+   cd "C:\Users\work\Desktop\Trace Point\bug-tracker"
+   npm run dev
+
+Wait for: "✓ Ready in X.Xs" message
+
+========================================
+STEP 3: OPEN THE APP
+========================================
+
+Open your browser to: http://localhost:3000
+
+========================================
+USING THE NEW FEATURES
+========================================
+
+CREATE A PROJECT:
+   1. Click "New Project" button
+   2. Enter name and description
+   3. Click "Create Project"
+
+OPEN A PROJECT (NEW!):
+   1. Click any project card
+   2. Opens in NEW WINDOW/TAB
+   3. Work on multiple projects at once!
+
+ADD PROJECT DETAILS (NEW!):
+   1. In project page, find "Project Details" section
+   2. Click "Edit" button
+   3. Add context, links, credentials, notes
+   4. Click "Save"
+
+ADD A BUG:
+   1. Click "Add Bug" button
+   2. Fill in the fields:
+      - Bug ID: Auto-generated (TP-1, TP-2...)
+      - Portal: Admin Panel / Customer Side
+      - Priority: Minor / Medium / Major / Critical
+      - Module/Feature: Where bug was found
+      - Bug Description: Detailed explanation
+      - Status: Open / In Progress / Ready for QA / etc.
+      - Assigned To: Developer / Frontend / Backend
+      - Bug Link: URL or location
+      - Client Notes: Client feedback
+      - Developer Notes: Technical notes
+   3. Click "Create Bug"
+
+EDIT/DELETE BUGS:
+   - Click "Edit" to modify a bug
+   - Click "Delete" to remove a bug
+
+========================================
+NEW FIELDS EXPLAINED
+========================================
+
+BUG ID: Auto-generated (TP-1, TP-2, TP-3...)
+   - Unique across all projects
+   - Sequential numbering
+   - No manual input needed
+
+PORTAL: Where the bug appears
+   - Admin Panel (backend/admin)
+   - Customer Side (frontend/user-facing)
+
+PRIORITY: How urgent the bug is
+   - Critical: Breaks core functionality
+   - Major: Significant impact
+   - Medium: Moderate impact
+   - Minor: Low impact
+
+MODULE/FEATURE: Location of bug
+   - Example: "Login Page", "Dashboard", "Checkout"
+
+STATUS: Current state of bug
+   - Open: Newly reported
+   - In Progress: Being worked on
+   - Ready for QA: Ready for testing
+   - Closed: Fixed and verified
+   - Reopened: Bug reappeared
+   - Not a Bug: Works as intended
+   - Needs Clarification: More info needed
+
+ASSIGNED TO: Who's working on it
+   - Developer: General developer
+   - Frontend: Frontend specialist
+   - Backend: Backend specialist
+
+========================================
+TROUBLESHOOTING
+========================================
+
+❌ "Missing script: dev" error
+   → You're in wrong directory
+   → Use: cd "C:\Users\work\Desktop\Trace Point\bug-tracker"
+
+❌ "Unable to connect" in browser
+   → Server isn't running
+   → Double-click START_HERE.bat
+
+❌ "Missing environment variable" error
+   → Restart the server
+   → Double-click START_HERE.bat
+
+❌ Bug ID not auto-generating
+   → Database not updated
+   → See UPDATE_DATABASE.md
+
+❌ New fields not showing
+   → Database not updated
+   → Clear browser cache
+   → Restart server
+
+========================================
+NEED MORE HELP?
+========================================
+
+Read these files for detailed information:
+- FEATURES_SUMMARY.md: Complete feature list
+- UPDATE_DATABASE.md: Database update guide
+- HOW_TO_RUN.txt: Server startup help
+- README.md: General information
+
+========================================
+
+🎉 You're all set! Happy bug tracking! 🎉
+
+========================================
+
