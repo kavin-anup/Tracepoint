@@ -15,9 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Tracepoint - Bug Tracker",
   description: "Manage your project features and bugs effortlessly",
-  icons: {
-    icon: '/logo.png',
-  },
 };
 
 export default function RootLayout({
