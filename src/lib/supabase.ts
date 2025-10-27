@@ -56,6 +56,7 @@ export type Database = {
           bug_link: string | null
           client_notes: string | null
           developer_notes: string | null
+          attachments: Array<{name: string, url: string, size: number, type: string}> | null
           date_added: string
           created_at: string
           updated_at: string
@@ -73,6 +74,7 @@ export type Database = {
           bug_link?: string | null
           client_notes?: string | null
           developer_notes?: string | null
+          attachments?: Array<{name: string, url: string, size: number, type: string}> | null
           date_added?: string
           created_at?: string
           updated_at?: string
@@ -90,6 +92,7 @@ export type Database = {
           bug_link?: string | null
           client_notes?: string | null
           developer_notes?: string | null
+          attachments?: Array<{name: string, url: string, size: number, type: string}> | null
           date_added?: string
           created_at?: string
           updated_at?: string

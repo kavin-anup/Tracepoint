@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Database } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import EditableDropdown from './EditableDropdown'
 
 type Bug = Database['public']['Tables']['bugs']['Row']
@@ -11,6 +12,13 @@ interface BugFormProps {
   bug?: Bug
   onSubmit: (bugData: Omit<Bug, 'id' | 'created_at' | 'updated_at' | 'date_added'>) => void
   onCancel: () => void
+}
+
+type Attachment = {
+  name: string
+  url: string
+  size: number
+  type: string
 }
 
 // Default dropdown options (cannot be deleted)
@@ -53,6 +61,11 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
   const [customPriorityOptions, setCustomPriorityOptions] = useState<string[]>([])
   const [customStatusOptions, setCustomStatusOptions] = useState<string[]>([])
   const [customAssignedToOptions, setCustomAssignedToOptions] = useState<string[]>([])
+  
+  // File upload state
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [existingAttachments, setExistingAttachments] = useState<Attachment[]>([])
+  const [uploadingFiles, setUploadingFiles] = useState(false)
 
   // Load custom options from localStorage on mount (project-specific)
   useEffect(() => {
@@ -76,24 +89,69 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
         client_notes: bug.client_notes || '',
         developer_notes: bug.developer_notes || ''
       })
+      setExistingAttachments(bug.attachments || [])
     }
   }, [bug])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit({
-      project_id: projectId,
-      bug_id: formData.bug_id,
-      portal: formData.portal,
-      priority: formData.priority,
-      module_feature: formData.module_feature || null,
-      bug_description: formData.bug_description || null,
-      status: formData.status,
-      assigned_to: formData.assigned_to,
-      bug_link: formData.bug_link || null,
-      client_notes: formData.client_notes || null,
-      developer_notes: formData.developer_notes || null
-    })
+    setUploadingFiles(true)
+
+    try {
+      // Upload new files to Supabase Storage
+      const uploadedFiles: Attachment[] = []
+      
+      for (const file of selectedFiles) {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+        const filePath = `${projectId}/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('bug-attachments')
+          .upload(filePath, file)
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError)
+          alert(`Failed to upload ${file.name}`)
+          continue
+        }
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('bug-attachments')
+          .getPublicUrl(filePath)
+
+        uploadedFiles.push({
+          name: file.name,
+          url: publicUrl,
+          size: file.size,
+          type: file.type
+        })
+      }
+
+      // Combine existing attachments with newly uploaded files
+      const allAttachments = [...existingAttachments, ...uploadedFiles]
+
+      onSubmit({
+        project_id: projectId,
+        bug_id: formData.bug_id,
+        portal: formData.portal,
+        priority: formData.priority,
+        module_feature: formData.module_feature || null,
+        bug_description: formData.bug_description || null,
+        status: formData.status,
+        assigned_to: formData.assigned_to,
+        bug_link: formData.bug_link || null,
+        client_notes: formData.client_notes || null,
+        developer_notes: formData.developer_notes || null,
+        attachments: allAttachments.length > 0 ? allAttachments : null
+      })
+    } catch (error) {
+      console.error('Error in handleSubmit:', error)
+      alert('An error occurred while submitting the form')
+    } finally {
+      setUploadingFiles(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -148,6 +206,53 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
     const updated = customAssignedToOptions.filter(opt => opt !== option)
     setCustomAssignedToOptions(updated)
     saveCustomOptions('custom_assigned_to_options', projectId, updated)
+  }
+
+  // File handling functions
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files)
+      setSelectedFiles(prev => [...prev, ...newFiles])
+    }
+  }
+
+  const handleRemoveSelectedFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleRemoveExistingAttachment = async (attachment: Attachment) => {
+    if (!confirm(`Are you sure you want to delete ${attachment.name}?`)) return
+
+    try {
+      // Extract file path from URL
+      const urlParts = attachment.url.split('/bug-attachments/')
+      if (urlParts.length > 1) {
+        const filePath = urlParts[1]
+        
+        const { error } = await supabase.storage
+          .from('bug-attachments')
+          .remove([filePath])
+
+        if (error) {
+          console.error('Delete error:', error)
+          alert('Failed to delete file')
+          return
+        }
+      }
+
+      setExistingAttachments(prev => prev.filter(a => a.url !== attachment.url))
+    } catch (error) {
+      console.error('Error deleting file:', error)
+      alert('An error occurred while deleting the file')
+    }
+  }
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
   }
 
   return (
@@ -284,6 +389,100 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
             />
           </div>
 
+          {/* File Attachments */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Attach Reference Files
+            </label>
+            
+            {/* File Upload Button */}
+            <div className="mb-3">
+              <label className="flex items-center justify-center w-full px-4 py-3 bg-white/5 border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:bg-white/10 hover:border-white/30 transition-colors">
+                <svg className="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className="text-sm text-gray-300">Choose Files (Images, Videos, PDFs, Docs, etc.)</span>
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  accept="*/*"
+                />
+              </label>
+              <p className="mt-1 text-xs text-gray-400">You can select multiple files of any type</p>
+            </div>
+
+            {/* Display Selected Files (Not yet uploaded) */}
+            {selectedFiles.length > 0 && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-400 mb-2">Files to upload ({selectedFiles.length}):</p>
+                <div className="space-y-2">
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between bg-blue-900/20 border border-blue-500/30 rounded-lg p-2">
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        <span className="text-sm text-white truncate">{file.name}</span>
+                        <span className="text-xs text-gray-400 flex-shrink-0">({formatFileSize(file.size)})</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSelectedFile(index)}
+                        className="ml-2 text-red-400 hover:text-red-300 flex-shrink-0"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Display Existing Attachments */}
+            {existingAttachments.length > 0 && (
+              <div>
+                <p className="text-xs text-gray-400 mb-2">Uploaded files ({existingAttachments.length}):</p>
+                <div className="space-y-2">
+                  {existingAttachments.map((attachment, index) => (
+                    <div key={index} className="flex items-center justify-between bg-green-900/20 border border-green-500/30 rounded-lg p-2">
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm text-white truncate">{attachment.name}</span>
+                        <span className="text-xs text-gray-400 flex-shrink-0">({formatFileSize(attachment.size)})</span>
+                      </div>
+                      <div className="flex items-center space-x-2 ml-2 flex-shrink-0">
+                        <a
+                          href={attachment.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 text-xs font-medium"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          View
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveExistingAttachment(attachment)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Client Notes */}
           <div>
             <label htmlFor="client_notes" className="block text-sm font-medium text-gray-300 mb-2">
@@ -327,9 +526,10 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-[#1e316d] hover:bg-[#2a4494] text-white rounded-lg font-medium transition-colors shadow-lg"
+              disabled={uploadingFiles}
+              className="px-4 py-2 bg-[#1e316d] hover:bg-[#2a4494] text-white rounded-lg font-medium transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {bug ? 'Update Bug' : 'Create Bug'}
+              {uploadingFiles ? 'Uploading...' : (bug ? 'Update Bug' : 'Create Bug')}
             </button>
           </div>
         </form>
