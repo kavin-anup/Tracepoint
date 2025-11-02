@@ -75,9 +75,11 @@ export default function EditableDropdown({
             type="button"
             onClick={() => setShowManageModal(true)}
             className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors shadow-lg"
-            title="Manage custom options"
+            title="Delete custom options"
           >
-            ⚙
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
           </button>
         )}
       </div>
@@ -125,50 +127,50 @@ export default function EditableDropdown({
       {/* Manage Options Modal */}
       {showManageModal && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">
+          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 max-w-md w-full max-h-[70vh] flex flex-col p-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex-shrink-0">
               Manage {label} Options
             </h3>
-            
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-300 mb-2">Default Options (Cannot be removed)</h4>
-              <div className="space-y-1">
-                {defaultOptions.map(option => (
-                  <div key={option} className="px-3 py-2 bg-white/5 border border-white/10 rounded text-gray-300 text-sm">
-                    {option}
+
+            <div className="flex-1 overflow-y-auto min-h-0 mb-4">
+              {customOptions.length > 0 ? (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Custom Options</h4>
+                  <div className="space-y-1">
+                    {customOptions.map(option => (
+                      <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
+                        <span>{option}</span>
+                        <button
+                          type="button"
+                          onClick={() => onRemoveOption(option)}
+                          className="text-red-400 hover:text-red-300 font-medium"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="text-gray-400 text-sm">
+                  No custom options added yet.
+                </div>
+              )}
             </div>
 
-            {customOptions.length > 0 && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-300 mb-2">Custom Options</h4>
-                <div className="space-y-1">
-                  {customOptions.map(option => (
-                    <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
-                      <span>{option}</span>
-                      <button
-                        type="button"
-                        onClick={() => onRemoveOption(option)}
-                        className="text-red-400 hover:text-red-300 font-medium"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
+            <div className="flex-shrink-0 mt-4 pt-4 border-t border-white/20">
+              <p className="text-xs text-gray-400 italic mb-4">
+                Note: Default options cannot be deleted.
+              </p>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowManageModal(false)}
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg font-medium transition-colors"
+                >
+                  Close
+                </button>
               </div>
-            )}
-
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setShowManageModal(false)}
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg font-medium transition-colors"
-              >
-                Close
-              </button>
             </div>
           </div>
         </div>

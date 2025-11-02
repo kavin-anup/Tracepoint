@@ -53,9 +53,9 @@ export type Database = {
           bug_description: string | null
           status: string
           assigned_to: string
-          bug_link: string | null
-          client_notes: string | null
-          developer_notes: string | null
+          client_notes: Array<{note: string, timestamp: string}> | null
+          developer_notes: Array<{note: string, timestamp: string}> | null
+          status_history: Array<{status: string, timestamp: string}> | null
           attachments: Array<{name: string, url: string, size: number, type: string}> | null
           date_added: string
           created_at: string
@@ -71,9 +71,9 @@ export type Database = {
           bug_description?: string | null
           status?: string
           assigned_to?: string
-          bug_link?: string | null
-          client_notes?: string | null
-          developer_notes?: string | null
+          client_notes?: Array<{note: string, timestamp: string}> | null
+          developer_notes?: Array<{note: string, timestamp: string}> | null
+          status_history?: Array<{status: string, timestamp: string}> | null
           attachments?: Array<{name: string, url: string, size: number, type: string}> | null
           date_added?: string
           created_at?: string
@@ -89,9 +89,9 @@ export type Database = {
           bug_description?: string | null
           status?: string
           assigned_to?: string
-          bug_link?: string | null
-          client_notes?: string | null
-          developer_notes?: string | null
+          client_notes?: Array<{note: string, timestamp: string}> | null
+          developer_notes?: Array<{note: string, timestamp: string}> | null
+          status_history?: Array<{status: string, timestamp: string}> | null
           attachments?: Array<{name: string, url: string, size: number, type: string}> | null
           date_added?: string
           created_at?: string

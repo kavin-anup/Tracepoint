@@ -11,6 +11,7 @@ type Project = Database['public']['Tables']['projects']['Row']
 
 interface ProjectWithBugCount extends Project {
   bugCount?: number
+  openBugCount?: number
 }
 
 export default function Home() {
@@ -56,12 +57,23 @@ export default function Home() {
       // Fetch bug counts for each project
       const projectsWithCounts = await Promise.all(
         (data || []).map(async (project) => {
+          // Get total bug count
           const { count } = await supabase
             .from('bugs')
             .select('*', { count: 'exact', head: true })
             .eq('project_id', project.id)
           
-          return { ...project, bugCount: count || 0 }
+          // Get open bug count (Open + Reopened)
+          const { data: bugs } = await supabase
+            .from('bugs')
+            .select('status')
+            .eq('project_id', project.id)
+          
+          const openBugCount = bugs?.filter(bug => 
+            bug.status.toLowerCase() === 'open' || bug.status.toLowerCase() === 'reopened'
+          ).length || 0
+          
+          return { ...project, bugCount: count || 0, openBugCount }
         })
       )
       
@@ -103,9 +115,8 @@ export default function Home() {
           assigned_to: 'Developer',
           module_feature: 'Example Bug',
           bug_description: 'Please give us a detailed description of the bug or the issue you would like clarity on',
-          bug_link: 'Please attach any links of screenshots/videos to help reproduce the bug',
-          client_notes: 'Clients can add context or feedback to the bugs',
-          developer_notes: 'Developers will provide updates if any in this section'
+          client_notes: [{note: 'Clients can add context or feedback to the bugs', timestamp: new Date().toISOString()}],
+          developer_notes: [{note: 'Developers will provide updates if any in this section', timestamp: new Date().toISOString()}]
         }])
         .select()
 
@@ -322,8 +333,13 @@ export default function Home() {
                           <div className="text-sm text-white/80 drop-shadow-md">
                             Created {new Date(project.created_at).toLocaleDateString()}
                           </div>
-                          <div className="text-sm text-white/80 drop-shadow-md">
-                            <span className="text-[#1e316d] font-semibold bg-white/90 px-2 py-0.5 rounded">Total Bugs:</span> <span className="font-semibold">{project.bugCount || 0}</span>
+                          <div className="flex flex-col gap-2">
+                            <div className="text-sm text-white/80 drop-shadow-md">
+                              <span className="text-red-600 font-semibold bg-white/90 px-2 py-0.5 rounded">Open Bugs:</span> <span className="font-semibold">{project.openBugCount || 0}</span>
+                            </div>
+                            <div className="text-sm text-white/80 drop-shadow-md">
+                              <span className="text-[#1e316d] font-semibold bg-white/90 px-2 py-0.5 rounded">Total Bugs:</span> <span className="font-semibold">{project.bugCount || 0}</span>
+                            </div>
                           </div>
                         </div>
                       </Link>
