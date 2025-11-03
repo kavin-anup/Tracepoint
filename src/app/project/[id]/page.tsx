@@ -516,7 +516,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                     onChange={(e) => setEditedDescription(e.target.value)}
                     className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400"
                     placeholder="Enter project description"
-                    rows={2}
+                    rows={3}
                   />
                 </div>
                 <div>
