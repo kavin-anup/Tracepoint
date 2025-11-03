@@ -6,6 +6,9 @@ import { Database } from '@/lib/supabase'
 import { use } from 'react'
 import BugForm from '@/components/BugForm'
 
+// Force dynamic rendering to avoid build-time errors
+export const dynamic = 'force-dynamic'
+
 type Project = Database['public']['Tables']['projects']['Row']
 type Bug = Database['public']['Tables']['bugs']['Row']
 

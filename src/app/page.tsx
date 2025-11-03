@@ -7,6 +7,9 @@ import { Database } from '@/lib/supabase'
 import ProjectForm from '@/components/ProjectForm'
 import Link from 'next/link'
 
+// Force dynamic rendering to avoid build-time errors
+export const dynamic = 'force-dynamic'
+
 type Project = Database['public']['Tables']['projects']['Row']
 
 interface ProjectWithBugCount extends Project {

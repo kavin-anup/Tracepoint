@@ -1,17 +1,52 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+// Lazy initialization to avoid errors during build time
+let supabaseClient: SupabaseClient | null = null
 
-if (!supabaseUrl) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable')
+function getSupabaseClient(): SupabaseClient {
+  // During build/SSR (when window is undefined), create a client with fallback values
+  // This prevents build-time errors when env vars aren't available
+  if (typeof window === 'undefined') {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
+    
+    if (!supabaseClient) {
+      supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+    }
+    return supabaseClient
+  }
+
+  // Client-side: validate and create/return client
+  if (!supabaseClient) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl) {
+      throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable')
+    }
+
+    if (!supabaseAnonKey) {
+      throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable')
+    }
+
+    supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+  }
+
+  return supabaseClient
 }
 
-if (!supabaseAnonKey) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable')
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Create a proxy that lazily initializes the client when accessed
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(target, prop) {
+    const client = getSupabaseClient()
+    const value = (client as unknown as Record<string, unknown>)[prop as string]
+    // If it's a function, bind it to the client to maintain 'this' context
+    if (typeof value === 'function') {
+      return value.bind(client)
+    }
+    return value
+  }
+})
 
 export type Database = {
   public: {
