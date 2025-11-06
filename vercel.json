@@ -1,0 +1,16 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.tracepoint.vercel.app"
+        }
+      ],
+      "destination": "https://tracepoint.vercel.app/:path*",
+      "permanent": true
+    }
+  ]
+}
+
