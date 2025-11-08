@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { sanitizeText, validateLength } from '@/lib/sanitize'
 
 interface ProjectFormProps {
   onSubmit: (name: string, description: string) => void
@@ -13,8 +14,16 @@ export default function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (name.trim()) {
-      onSubmit(name.trim(), description.trim())
+    
+    // Sanitize and validate inputs
+    const sanitizedName = sanitizeText(name.trim())
+    const validatedName = validateLength(sanitizedName, 200, 1) // Max 200 chars, min 1
+    
+    const sanitizedDescription = sanitizeText(description.trim())
+    const validatedDescription = validateLength(sanitizedDescription, 1000) // Max 1000 chars
+    
+    if (validatedName) {
+      onSubmit(validatedName, validatedDescription)
     }
   }
 

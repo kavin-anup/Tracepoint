@@ -2,34 +2,79 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
+import { rateLimitLogin } from '@/lib/rateLimit'
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    // Check if already authenticated
-    const authStatus = localStorage.getItem('isAuthenticated')
-    if (authStatus === 'true') {
-      router.push('/')
-    } else {
-      setCheckingAuth(false)
+    // Check if already authenticated with Supabase
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          router.push('/')
+        } else {
+          setCheckingAuth(false)
+        }
+      } catch (error) {
+        console.error('Error checking session:', error)
+        setCheckingAuth(false)
+      }
+    }
+    
+    checkSession()
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        router.push('/')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
     }
   }, [router])
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Check credentials
-    if (username === 'kavin@boostmysites.com' && password === 'TracepoinT777') {
-      // Store login state
-      localStorage.setItem('isAuthenticated', 'true')
-      router.push('/')
-    } else {
-      setError('Invalid username or password')
+    setError('')
+    setLoading(true)
+
+    // Rate limiting check
+    if (!rateLimitLogin(email.trim())) {
+      setError('Too many login attempts. Please wait 15 minutes before trying again.')
+      setLoading(false)
+      return
+    }
+
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password
+      })
+
+      if (authError) {
+        setError(authError.message || 'Invalid email or password')
+        setLoading(false)
+        return
+      }
+
+      if (data.session) {
+        // Successfully logged in, router will handle redirect via onAuthStateChange
+        router.push('/')
+      }
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('An error occurred during login. Please try again.')
+      setLoading(false)
     }
   }
 
@@ -84,23 +129,24 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
-                Admin Username:
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                Email Address:
               </label>
               <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400"
-                placeholder="Enter your username"
+                placeholder="Enter your email"
                 required
+                disabled={loading}
               />
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Access Password:
+                Password:
               </label>
               <input
                 type="password"
@@ -110,14 +156,16 @@ export default function LoginPage() {
                 className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400"
                 placeholder="Enter your password"
                 required
+                disabled={loading}
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-[#1e316d] hover:bg-[#2a4494] text-white px-4 py-3 rounded-lg font-medium transition-colors shadow-lg mt-6"
+              disabled={loading}
+              className="w-full bg-[#1e316d] hover:bg-[#2a4494] disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-medium transition-colors shadow-lg mt-6"
             >
-              Sign In
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
         </div>

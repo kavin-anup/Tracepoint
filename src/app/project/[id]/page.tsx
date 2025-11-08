@@ -31,6 +31,8 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   const [filterAssignedTo, setFilterAssignedTo] = useState<string>('all')
   const [showFilterDropdown, setShowFilterDropdown] = useState(false)
   const [showEditDropdowns, setShowEditDropdowns] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [checkingAuth, setCheckingAuth] = useState(true)
 
   // Default dropdown options
   const DEFAULT_PORTAL_OPTIONS = ['Admin Panel', 'Customer Side']
@@ -46,6 +48,26 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
 
   useEffect(() => {
+    // Check authentication status (but don't block access)
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        setIsAuthenticated(!!session)
+      } catch (error) {
+        console.error('Error checking auth:', error)
+        setIsAuthenticated(false)
+      } finally {
+        setCheckingAuth(false)
+      }
+    }
+    
+    checkAuth()
+    
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session)
+    })
+
     fetchProject()
     fetchBugs()
     
@@ -81,6 +103,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
       return () => {
         window.removeEventListener('popstate', preventBack)
+        subscription.unsubscribe()
       }
     }
   }, [resolvedParams.id])
@@ -459,7 +482,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
           <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg sm:text-xl font-semibold text-white">Project Details</h2>
-              {!isEditingDetails ? (
+              {isAuthenticated && !isEditingDetails ? (
                 <button
                   onClick={() => {
                     if (!projectDetails) {
@@ -473,7 +496,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                 >
                   Edit
                 </button>
-              ) : (
+              ) : isAuthenticated && isEditingDetails ? (
                 <div className="space-x-2">
                   <button
                     onClick={handleSaveProjectDetails}
@@ -601,25 +624,27 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
             <span>Add Bug</span>
           </button>
 
-          {/* Edit Dropdowns Button */}
-          <button
-            onClick={() => {
-              setShowEditDropdowns(!showEditDropdowns)
-              setShowFilterDropdown(false)
-            }}
-            className="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
-          >
-            <span>Edit Dropdowns</span>
-            {showEditDropdowns ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
-          </button>
+          {/* Edit Dropdowns Button - Only for authenticated users */}
+          {isAuthenticated && (
+            <button
+              onClick={() => {
+                setShowEditDropdowns(!showEditDropdowns)
+                setShowFilterDropdown(false)
+              }}
+              className="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
+            >
+              <span>Edit Dropdowns</span>
+              {showEditDropdowns ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              )}
+            </button>
+          )}
 
           {/* Filter View Button */}
           <button
@@ -1168,15 +1193,17 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                         >
                           Edit
                         </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteBug(bug.id)
-                          }}
-                          className="text-red-400 hover:text-red-300 text-left text-xs sm:text-sm"
-                        >
-                          Delete
-                        </button>
+                        {isAuthenticated && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteBug(bug.id)
+                            }}
+                            className="text-red-400 hover:text-red-300 text-left text-xs sm:text-sm"
+                          >
+                            Delete
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -1366,17 +1393,19 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
               </div>
 
               <div className="flex justify-end space-x-3 p-4 sm:p-6 border-t border-white/20 flex-shrink-0">
-                <button
-                  onClick={() => {
-                    if (confirm('Are you sure you want to delete this bug?')) {
-                      handleDeleteBug(viewingBug.id)
-                      setViewingBug(null)
-                    }
-                  }}
-                  className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white border border-red-500/30 rounded-lg font-medium transition-colors text-sm sm:text-base"
-                >
-                  Delete Bug
-                </button>
+                {isAuthenticated && (
+                  <button
+                    onClick={() => {
+                      if (confirm('Are you sure you want to delete this bug?')) {
+                        handleDeleteBug(viewingBug.id)
+                        setViewingBug(null)
+                      }
+                    }}
+                    className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white border border-red-500/30 rounded-lg font-medium transition-colors text-sm sm:text-base"
+                  >
+                    Delete Bug
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setViewingBug(null)

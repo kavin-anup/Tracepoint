@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Database } from '@/lib/supabase'
 import { supabase } from '@/lib/supabase'
+import { sanitizeText, validateLength } from '@/lib/sanitize'
 
 type Bug = Database['public']['Tables']['bugs']['Row']
 
@@ -213,20 +214,30 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
 
       // Handle client notes
       if (currentClientNote.trim()) {
-        // User typed a new note, add it
-        finalClientNotes.push({
-          note: currentClientNote.trim(),
-          timestamp: new Date().toISOString()
-        })
+        // Sanitize and validate note
+        const sanitizedNote = sanitizeText(currentClientNote.trim())
+        const validatedNote = validateLength(sanitizedNote, 5000) // Max 5000 chars per note
+        
+        if (validatedNote) {
+          finalClientNotes.push({
+            note: validatedNote,
+            timestamp: new Date().toISOString()
+          })
+        }
       }
 
       // Handle developer notes
       if (currentDeveloperNote.trim()) {
-        // User typed a new note, add it
-        finalDeveloperNotes.push({
-          note: currentDeveloperNote.trim(),
-          timestamp: new Date().toISOString()
-        })
+        // Sanitize and validate note
+        const sanitizedNote = sanitizeText(currentDeveloperNote.trim())
+        const validatedNote = validateLength(sanitizedNote, 5000) // Max 5000 chars per note
+        
+        if (validatedNote) {
+          finalDeveloperNotes.push({
+            note: validatedNote,
+            timestamp: new Date().toISOString()
+          })
+        }
       }
 
       // Sort by timestamp ascending (oldest first) for proper numbering (oldest = Note 1)
@@ -283,7 +294,24 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    
+    // Sanitize input based on field type
+    let sanitizedValue = value
+    
+    if (name === 'module_feature' || name === 'bug_description') {
+      // Sanitize text fields (remove HTML, limit length)
+      sanitizedValue = sanitizeText(value)
+      sanitizedValue = validateLength(sanitizedValue, 5000) // Max 5000 chars
+    } else if (name === 'portal' || name === 'priority' || name === 'status' || name === 'assigned_to') {
+      // Sanitize dropdown values
+      sanitizedValue = sanitizeText(value)
+      sanitizedValue = validateLength(sanitizedValue, 100) // Max 100 chars
+    } else {
+      // Default sanitization
+      sanitizedValue = sanitizeText(value)
+    }
+    
+    setFormData(prev => ({ ...prev, [name]: sanitizedValue }))
   }
 
   // Combine default and custom options for dropdowns
@@ -292,12 +320,73 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
   const allStatusOptions = [...DEFAULT_STATUS_OPTIONS, ...customStatusOptions]
   const allAssignedToOptions = [...DEFAULT_ASSIGNED_TO_OPTIONS, ...customAssignedToOptions]
 
+  // File validation constants
+  const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB per file
+  const MAX_TOTAL_SIZE = 50 * 1024 * 1024 // 50MB total
+  const ALLOWED_FILE_TYPES = [
+    // Images
+    'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+    // Videos
+    'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/webm',
+    // Documents
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+    'text/csv'
+  ]
+  const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.mp4', '.mpeg', '.mov', '.avi', '.webm', '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.csv']
+
   // File handling functions
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files)
-      setSelectedFiles(prev => [...prev, ...newFiles])
+    if (!e.target.files) return
+
+    const newFiles = Array.from(e.target.files)
+    const errors: string[] = []
+    const validFiles: File[] = []
+
+    // Calculate current total size
+    const currentTotalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0)
+
+    newFiles.forEach((file) => {
+      // Check file type
+      const isValidType = ALLOWED_FILE_TYPES.includes(file.type) || 
+        ALLOWED_EXTENSIONS.some(ext => file.name.toLowerCase().endsWith(ext))
+      
+      if (!isValidType) {
+        errors.push(`${file.name}: File type not allowed. Allowed types: images, videos, PDFs, documents`)
+        return
+      }
+
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        errors.push(`${file.name}: File size exceeds ${MAX_FILE_SIZE / (1024 * 1024)}MB limit`)
+        return
+      }
+
+      // Check total size
+      if (currentTotalSize + file.size > MAX_TOTAL_SIZE) {
+        errors.push(`${file.name}: Total file size would exceed ${MAX_TOTAL_SIZE / (1024 * 1024)}MB limit`)
+        return
+      }
+
+      validFiles.push(file)
+    })
+
+    // Show errors if any
+    if (errors.length > 0) {
+      alert('File validation errors:\n\n' + errors.join('\n'))
     }
+
+    // Add valid files
+    if (validFiles.length > 0) {
+      setSelectedFiles(prev => [...prev, ...validFiles])
+    }
+
+    // Reset input
+    e.target.value = ''
   }
 
   const handleRemoveSelectedFile = (index: number) => {
@@ -512,15 +601,18 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 <span className="text-sm text-gray-300">Choose Files (Images, Videos, PDFs, Docs, etc.)</span>
-            <input
+                <input
                   type="file"
                   multiple
                   onChange={handleFileSelect}
                   className="hidden"
-                  accept="*/*"
+                  accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
                 />
               </label>
-              <p className="mt-1 text-xs text-gray-400">You can select multiple files of any type up to 50MB</p>
+              <p className="mt-1 text-xs text-gray-400">
+                Allowed: Images, Videos, PDFs, Documents (DOC, XLS, TXT, CSV). 
+                Max 10MB per file, 50MB total.
+              </p>
             </div>
 
             {/* Display Selected Files (Not yet uploaded) */}

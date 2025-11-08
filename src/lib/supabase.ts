@@ -11,7 +11,13 @@ function getSupabaseClient(): SupabaseClient {
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
     
     if (!supabaseClient) {
-      supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+      supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      })
     }
     return supabaseClient
   }
@@ -29,7 +35,13 @@ function getSupabaseClient(): SupabaseClient {
       throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable')
     }
 
-    supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+    supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    })
   }
 
   return supabaseClient

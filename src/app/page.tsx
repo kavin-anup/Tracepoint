@@ -37,14 +37,40 @@ export default function Home() {
   ]
 
   useEffect(() => {
-    // Check authentication
-    const authStatus = localStorage.getItem('isAuthenticated')
-    if (authStatus === 'true') {
-      setIsAuthenticated(true)
-      setCheckingAuth(false)
-      fetchProjects()
-    } else {
-      router.push('/login')
+    // Check authentication with Supabase
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          setIsAuthenticated(true)
+          setCheckingAuth(false)
+          fetchProjects()
+        } else {
+          setCheckingAuth(false)
+          router.push('/login')
+        }
+      } catch (error) {
+        console.error('Error checking session:', error)
+        setCheckingAuth(false)
+        router.push('/login')
+      }
+    }
+
+    checkSession()
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setIsAuthenticated(true)
+        fetchProjects()
+      } else {
+        setIsAuthenticated(false)
+        router.push('/login')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
     }
   }, [router])
 
@@ -171,9 +197,14 @@ export default function Home() {
     }
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated')
-    router.push('/login')
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      router.push('/login')
+    } catch (error) {
+      console.error('Error signing out:', error)
+      router.push('/login')
+    }
   }
 
   // Filter projects based on search query
