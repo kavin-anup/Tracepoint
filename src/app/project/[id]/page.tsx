@@ -265,21 +265,15 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
       // Search in Client Notes
       if (Array.isArray(bug.client_notes) && bug.client_notes.length > 0) {
         if (bug.client_notes.some(note => 
-          (typeof note === 'object' && note.note?.toLowerCase().includes(query)) ||
-          (typeof note === 'string' && note.toLowerCase().includes(query))
+          note.note?.toLowerCase().includes(query)
         )) return true
-      } else if (typeof bug.client_notes === 'string' && bug.client_notes.toLowerCase().includes(query)) {
-        return true
       }
       
       // Search in Developer Notes
       if (Array.isArray(bug.developer_notes) && bug.developer_notes.length > 0) {
         if (bug.developer_notes.some(note => 
-          (typeof note === 'object' && note.note?.toLowerCase().includes(query)) ||
-          (typeof note === 'string' && note.toLowerCase().includes(query))
+          note.note?.toLowerCase().includes(query)
         )) return true
-      } else if (typeof bug.developer_notes === 'string' && bug.developer_notes.toLowerCase().includes(query)) {
-        return true
       }
       
       return false
@@ -555,7 +549,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                     Cancel
                   </button>
                 </div>
-              )}
+              ) : null}
             </div>
             {isEditingDetails ? (
               <div className="space-y-4">
@@ -1240,8 +1234,6 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                       </div>
                           )
                         })()
-                      ) : bug.client_notes && typeof bug.client_notes === 'string' ? (
-                        <div className="break-words line-clamp-3 max-w-[200px]">{bug.client_notes}</div>
                       ) : '-'}
                     </td>
                     <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
@@ -1257,8 +1249,6 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                       </div>
                           )
                         })()
-                      ) : bug.developer_notes && typeof bug.developer_notes === 'string' ? (
-                        <div className="break-words line-clamp-3 max-w-[200px]">{bug.developer_notes}</div>
                       ) : '-'}
                     </td>
                     <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300 whitespace-nowrap">
@@ -1429,7 +1419,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                       </>
                     ) : (
                       <div className="text-white bg-purple-900/30 p-3 rounded border border-purple-500/30 whitespace-pre-wrap text-sm sm:text-base">
-                        {typeof viewingBug.client_notes === 'string' ? viewingBug.client_notes : '-'}
+                        -
                       </div>
                     )}
                   </div>
@@ -1467,7 +1457,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                       </>
                     ) : (
                       <div className="text-white bg-yellow-900/30 p-3 rounded border border-yellow-500/30 whitespace-pre-wrap text-sm sm:text-base">
-                        {typeof viewingBug.developer_notes === 'string' ? viewingBug.developer_notes : '-'}
+                        -
                       </div>
                     )}
                   </div>
