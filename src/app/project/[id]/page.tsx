@@ -29,6 +29,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [filterPriority, setFilterPriority] = useState<string>('all')
   const [filterAssignedTo, setFilterAssignedTo] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState<string>('')
   const [showFilterDropdown, setShowFilterDropdown] = useState(false)
   const [showEditDropdowns, setShowEditDropdowns] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -240,13 +241,51 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
     }
   }
 
-  // Filter bugs based on selected filters
+  // Filter bugs based on selected filters and search query
   const filteredBugs = bugs.filter(bug => {
+    // Apply dropdown filters
     const portalMatch = filterPortal === 'all' || bug.portal === filterPortal
     const statusMatch = filterStatus === 'all' || bug.status === filterStatus
     const priorityMatch = filterPriority === 'all' || bug.priority === filterPriority
     const assignedToMatch = filterAssignedTo === 'all' || bug.assigned_to === filterAssignedTo
-    return portalMatch && statusMatch && priorityMatch && assignedToMatch
+    
+    // Apply search query (case-insensitive search across multiple fields)
+    const searchMatch = !searchQuery.trim() || (() => {
+      const query = searchQuery.toLowerCase().trim()
+      
+      // Search in Bug ID
+      if (bug.bug_id?.toLowerCase().includes(query)) return true
+      
+      // Search in Bug Title (module_feature)
+      if (bug.module_feature?.toLowerCase().includes(query)) return true
+      
+      // Search in Bug Description
+      if (bug.bug_description?.toLowerCase().includes(query)) return true
+      
+      // Search in Client Notes
+      if (Array.isArray(bug.client_notes) && bug.client_notes.length > 0) {
+        if (bug.client_notes.some(note => 
+          (typeof note === 'object' && note.note?.toLowerCase().includes(query)) ||
+          (typeof note === 'string' && note.toLowerCase().includes(query))
+        )) return true
+      } else if (typeof bug.client_notes === 'string' && bug.client_notes.toLowerCase().includes(query)) {
+        return true
+      }
+      
+      // Search in Developer Notes
+      if (Array.isArray(bug.developer_notes) && bug.developer_notes.length > 0) {
+        if (bug.developer_notes.some(note => 
+          (typeof note === 'object' && note.note?.toLowerCase().includes(query)) ||
+          (typeof note === 'string' && note.toLowerCase().includes(query))
+        )) return true
+      } else if (typeof bug.developer_notes === 'string' && bug.developer_notes.toLowerCase().includes(query)) {
+        return true
+      }
+      
+      return false
+    })()
+    
+    return portalMatch && statusMatch && priorityMatch && assignedToMatch && searchMatch
   })
 
   // Get all available filter options (default + custom)
@@ -613,16 +652,18 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
           />
         )}
 
-        {/* Action Buttons Above Table */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6">
-          {/* Add Bug Button */}
-          <button
-            onClick={() => setShowBugForm(true)}
-            className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
-          >
-            <span>+</span>
-            <span>Add Bug</span>
-          </button>
+        {/* Action Buttons and Search Bar */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6 items-stretch sm:items-center">
+          {/* Left Side - Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 flex-1 sm:flex-none">
+            {/* Add Bug Button */}
+            <button
+              onClick={() => setShowBugForm(true)}
+              className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
+            >
+              <span>+</span>
+              <span>Add Bug</span>
+            </button>
 
           {/* Edit Dropdowns Button - Only for authenticated users */}
           {isAuthenticated && (
@@ -665,6 +706,40 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
               </svg>
             )}
           </button>
+          </div>
+
+          {/* Right Side - Search Bar */}
+          <div className="flex-1 sm:flex-none w-full sm:w-auto">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Search bugs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-10 py-2 sm:py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm sm:text-base"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  <svg className="w-5 h-5 text-gray-400 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            {searchQuery && (
+              <div className="mt-1 text-xs text-gray-400">
+                {filteredBugs.length} {filteredBugs.length === 1 ? 'bug' : 'bugs'} found
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Filter View Dropdown - Expands Below */}
@@ -672,17 +747,18 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
           <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6">
             <div className="flex items-center justify-between mb-4">
                   <h3 className="text-base sm:text-lg font-semibold text-white">Filter Bugs</h3>
-              {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all') && (
+              {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all' || searchQuery) && (
                 <button
                   onClick={() => {
                     setFilterPortal('all')
                     setFilterStatus('all')
                     setFilterPriority('all')
                     setFilterAssignedTo('all')
+                    setSearchQuery('')
                   }}
                       className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors"
                 >
-                      Clear
+                      Clear All
                 </button>
               )}
             </div>
@@ -759,9 +835,10 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                 </select>
               </div>
             </div>
-            {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all') && (
+            {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all' || searchQuery) && (
                   <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-400">
                 Showing {filteredBugs.length} of {bugs.length} bugs
+                {searchQuery && ` (searching for "${searchQuery}")`}
               </div>
             )}
           </div>
@@ -1074,17 +1151,22 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                 {filteredBugs.length === 0 ? (
                   <tr>
                     <td colSpan={12} className="px-2 sm:px-3 py-8 text-center">
-                      <div className="text-gray-400 text-lg mb-2">No bugs match the selected filters</div>
+                      <div className="text-gray-400 text-lg mb-2">
+                        {searchQuery 
+                          ? `No bugs found matching "${searchQuery}"`
+                          : 'No bugs match the selected filters'}
+                      </div>
                       <button
                         onClick={() => {
                           setFilterPortal('all')
                           setFilterStatus('all')
                           setFilterPriority('all')
                           setFilterAssignedTo('all')
+                          setSearchQuery('')
                         }}
                         className="text-[#1e316d] bg-white/90 hover:bg-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                       >
-                        Clear Filters
+                        Clear Filters & Search
                       </button>
                     </td>
                   </tr>
