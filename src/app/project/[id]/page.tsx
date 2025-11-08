@@ -659,27 +659,25 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
               <span>Add Bug</span>
             </button>
 
-          {/* Edit Dropdowns Button - Only for authenticated users */}
-          {isAuthenticated && (
-            <button
-              onClick={() => {
-                setShowEditDropdowns(!showEditDropdowns)
-                setShowFilterDropdown(false)
-              }}
-              className="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
-            >
-              <span>Edit Dropdowns</span>
-              {showEditDropdowns ? (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              )}
-            </button>
-          )}
+          {/* Edit Dropdowns Button - Available for all users */}
+          <button
+            onClick={() => {
+              setShowEditDropdowns(!showEditDropdowns)
+              setShowFilterDropdown(false)
+            }}
+            className="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
+          >
+            <span>Edit Dropdowns</span>
+            {showEditDropdowns ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
+          </button>
 
           {/* Filter View Button */}
           <button
