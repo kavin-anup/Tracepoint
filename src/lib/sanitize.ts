@@ -39,10 +39,16 @@ export function sanitizeHtml(html: string): string {
  * Sanitize plain text input
  * Removes HTML tags and dangerous characters
  */
-export function sanitizeText(text: string): string {
+interface SanitizeTextOptions {
+  trim?: boolean
+}
+
+export function sanitizeText(text: string, options: SanitizeTextOptions = {}): string {
   if (!text || typeof text !== 'string') {
     return ''
   }
+
+  const { trim = true } = options
 
   // Remove HTML tags
   let sanitized = text.replace(/<[^>]*>/g, '')
@@ -59,7 +65,7 @@ export function sanitizeText(text: string): string {
   // Remove control characters except newlines and tabs
   sanitized = sanitized.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
   
-  return sanitized.trim()
+  return trim ? sanitized.trim() : sanitized
 }
 
 /**

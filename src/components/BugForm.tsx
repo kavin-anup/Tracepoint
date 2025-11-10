@@ -300,15 +300,15 @@ export default function BugForm({ projectId, bug, onSubmit, onCancel }: BugFormP
     
     if (name === 'module_feature' || name === 'bug_description') {
       // Sanitize text fields (remove HTML, limit length)
-      sanitizedValue = sanitizeText(value)
+      sanitizedValue = sanitizeText(value, { trim: false })
       sanitizedValue = validateLength(sanitizedValue, 5000) // Max 5000 chars
     } else if (name === 'portal' || name === 'priority' || name === 'status' || name === 'assigned_to') {
       // Sanitize dropdown values
-      sanitizedValue = sanitizeText(value)
+      sanitizedValue = sanitizeText(value, { trim: false })
       sanitizedValue = validateLength(sanitizedValue, 100) // Max 100 chars
     } else {
       // Default sanitization
-      sanitizedValue = sanitizeText(value)
+      sanitizedValue = sanitizeText(value, { trim: false })
     }
     
     setFormData(prev => ({ ...prev, [name]: sanitizedValue }))
