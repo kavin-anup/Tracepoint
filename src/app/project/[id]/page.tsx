@@ -61,9 +61,9 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
         setCheckingAuth(false)
       }
     }
-    
+
     checkAuth()
-    
+
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session)
@@ -71,7 +71,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
     fetchProject()
     fetchBugs()
-    
+
     // Load custom options from localStorage
     if (typeof window !== 'undefined') {
       const portalKey = `custom_portal_options_${resolvedParams.id}`
@@ -155,10 +155,10 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
     try {
       const { data, error } = await supabase
         .from('projects')
-        .update({ 
+        .update({
           name: editedName,
           description: editedDescription,
-          project_details: projectDetails 
+          project_details: projectDetails
         })
         .eq('id', resolvedParams.id)
         .select()
@@ -175,7 +175,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   const handleCreateBug = async (bugData: Omit<Bug, 'id' | 'created_at' | 'updated_at' | 'date_added'>) => {
     try {
       console.log('Creating bug with data:', bugData)
-      const { data, error} = await supabase
+      const { data, error } = await supabase
         .from('bugs')
         .insert([bugData])
         .select()
@@ -186,7 +186,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
         alert(`Error creating bug: ${error.message}`)
         throw error
       }
-      
+
       console.log('Bug created successfully:', data)
       setBugs([data, ...bugs])
       setShowBugForm(false)
@@ -248,37 +248,37 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
     const statusMatch = filterStatus === 'all' || bug.status === filterStatus
     const priorityMatch = filterPriority === 'all' || bug.priority === filterPriority
     const assignedToMatch = filterAssignedTo === 'all' || bug.assigned_to === filterAssignedTo
-    
+
     // Apply search query (case-insensitive search across multiple fields)
     const searchMatch = !searchQuery.trim() || (() => {
       const query = searchQuery.toLowerCase().trim()
-      
+
       // Search in Bug ID
       if (bug.bug_id?.toLowerCase().includes(query)) return true
-      
+
       // Search in Bug Title (module_feature)
       if (bug.module_feature?.toLowerCase().includes(query)) return true
-      
+
       // Search in Bug Description
       if (bug.bug_description?.toLowerCase().includes(query)) return true
-      
+
       // Search in Client Notes
       if (Array.isArray(bug.client_notes) && bug.client_notes.length > 0) {
-        if (bug.client_notes.some(note => 
+        if (bug.client_notes.some(note =>
           note.note?.toLowerCase().includes(query)
         )) return true
       }
-      
+
       // Search in Developer Notes
       if (Array.isArray(bug.developer_notes) && bug.developer_notes.length > 0) {
-        if (bug.developer_notes.some(note => 
+        if (bug.developer_notes.some(note =>
           note.note?.toLowerCase().includes(query)
         )) return true
       }
-      
+
       return false
     })()
-    
+
     return portalMatch && statusMatch && priorityMatch && assignedToMatch && searchMatch
   })
 
@@ -286,7 +286,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   const allPortalOptions = [...DEFAULT_PORTAL_OPTIONS, ...customPortalOptions]
   const allStatusOptions = [...DEFAULT_STATUS_OPTIONS, ...customStatusOptions]
   const allPriorityOptions = [...DEFAULT_PRIORITY_OPTIONS, ...customPriorityOptions]
-  
+
   // Get unique assigned to values from bugs + default + custom
   const bugAssignedToOptions = Array.from(new Set(bugs.map(bug => bug.assigned_to).filter(Boolean)))
   const allAssignedToOptions = Array.from(new Set([...DEFAULT_ASSIGNED_TO_OPTIONS, ...customAssignedToOptions, ...bugAssignedToOptions])).sort()
@@ -354,36 +354,36 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   const getFileType = (attachment: { name: string; url: string; size: number; type: string }): 'image' | 'video' | 'pdf' | 'file' => {
     const name = attachment.name.toLowerCase()
     const type = attachment.type?.toLowerCase() || ''
-    
+
     // Check by MIME type first
     if (type.includes('image/')) return 'image'
     if (type.includes('video/')) return 'video'
     if (type.includes('pdf') || type === 'application/pdf') return 'pdf'
-    
+
     // Check by file extension
     if (name.match(/\.(jpg|jpeg|png|gif|bmp|webp|svg)$/)) return 'image'
     if (name.match(/\.(mp4|avi|mov|wmv|flv|webm|mkv)$/)) return 'video'
     if (name.match(/\.(pdf)$/)) return 'pdf'
-    
+
     return 'file'
   }
 
   // Icon component for file types
   const FileTypeIcon = ({ type, url, name }: { type: 'image' | 'video' | 'pdf' | 'file', url: string, name: string }) => {
     const iconClasses = "w-5 h-5 text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
-    
+
     const handleClick = (e: React.MouseEvent) => {
       e.stopPropagation()
       window.open(url, '_blank', 'noopener,noreferrer')
     }
-    
+
     switch (type) {
       case 'image':
         return (
-          <svg 
-            className={iconClasses} 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className={iconClasses}
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
             onClick={handleClick}
           >
@@ -393,10 +393,10 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
         )
       case 'video':
         return (
-          <svg 
-            className={iconClasses} 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className={iconClasses}
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
             onClick={handleClick}
           >
@@ -406,10 +406,10 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
         )
       case 'pdf':
         return (
-          <svg 
-            className={iconClasses} 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className={iconClasses}
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
             onClick={handleClick}
           >
@@ -419,10 +419,10 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
         )
       default:
         return (
-          <svg 
-            className={iconClasses} 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className={iconClasses}
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
             onClick={handleClick}
           >
@@ -452,23 +452,23 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   return (
     <div className="min-h-screen bg-black relative">
       {/* Background Image with Opacity */}
-      <div 
+      <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: 'url(/background.jpg)',
           opacity: 0.5
         }}
       />
-      
+
       {/* Content */}
       <div className="relative z-10">
         <div className="backdrop-blur-md bg-white/5 border-b border-white/10 shadow-lg">
           <div className="max-w-[98%] mx-auto px-2 sm:px-4 lg:px-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 sm:py-6 gap-3 sm:gap-0">
               <div className="flex items-center gap-2 sm:gap-3">
-                <img 
-                  src="/logo.png" 
-                  alt="Tracepoint Logo" 
+                <img
+                  src="/logo.png"
+                  alt="Tracepoint Logo"
                   className="w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20"
                 />
                 <div>
@@ -481,11 +481,10 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center w-full sm:w-auto gap-2">
                 <button
                   onClick={handleCopyLink}
-                  className={`flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all shadow-lg text-sm sm:text-base ${
-                    copyLinkSuccess 
-                      ? 'bg-green-600 text-white' 
+                  className={`flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all shadow-lg text-sm sm:text-base ${copyLinkSuccess
+                      ? 'bg-green-600 text-white'
                       : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
-                  }`}
+                    }`}
                 >
                   {copyLinkSuccess ? (
                     <>
@@ -508,993 +507,993 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
           </div>
         </div>
 
-      <div className="max-w-[98%] mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-        {/* Two Column Layout: Project Details + Current Status */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-          {/* Project Details Section */}
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg sm:text-xl font-semibold text-white">Project Details</h2>
-              {isAuthenticated && !isEditingDetails ? (
-                <button
-                  onClick={() => {
-                    if (!projectDetails) {
-                      setProjectDetails('URL: \nUsername: \nPassword: ')
-                    }
-                    setEditedName(project?.name || '')
-                    setEditedDescription(project?.description || '')
-                    setIsEditingDetails(true)
-                  }}
-                  className="text-xs sm:text-sm text-[#1e316d] bg-white/90 hover:bg-white px-2 sm:px-3 py-1 sm:py-1.5 rounded font-medium transition-colors"
-                >
-                  Edit
-                </button>
-              ) : isAuthenticated && isEditingDetails ? (
-                <div className="space-x-2">
-                  <button
-                    onClick={handleSaveProjectDetails}
-                    className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors shadow-lg text-sm"
-                  >
-                    Save
-                  </button>
+        <div className="max-w-[98%] mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+          {/* Two Column Layout: Project Details + Current Status */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+            {/* Project Details Section */}
+            <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg sm:text-xl font-semibold text-white">Project Details</h2>
+                {isAuthenticated && !isEditingDetails ? (
                   <button
                     onClick={() => {
-                      setProjectDetails(project.project_details || '')
-                      setEditedName(project.name || '')
-                      setEditedDescription(project.description || '')
-                      setIsEditingDetails(false)
+                      if (!projectDetails) {
+                        setProjectDetails('URL: \nUsername: \nPassword: ')
+                      }
+                      setEditedName(project?.name || '')
+                      setEditedDescription(project?.description || '')
+                      setIsEditingDetails(true)
                     }}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm"
+                    className="text-xs sm:text-sm text-[#1e316d] bg-white/90 hover:bg-white px-2 sm:px-3 py-1 sm:py-1.5 rounded font-medium transition-colors"
                   >
-                    Cancel
+                    Edit
                   </button>
+                ) : isAuthenticated && isEditingDetails ? (
+                  <div className="space-x-2">
+                    <button
+                      onClick={handleSaveProjectDetails}
+                      className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors shadow-lg text-sm"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => {
+                        setProjectDetails(project.project_details || '')
+                        setEditedName(project.name || '')
+                        setEditedDescription(project.description || '')
+                        setIsEditingDetails(false)
+                      }}
+                      className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+              {isEditingDetails ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Project Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={editedName}
+                      onChange={(e) => setEditedName(e.target.value)}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400"
+                      placeholder="Enter project name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      value={editedDescription}
+                      onChange={(e) => setEditedDescription(e.target.value)}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400"
+                      placeholder="Enter project description"
+                      rows={3}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Additional Details
+                    </label>
+                    <textarea
+                      value={projectDetails}
+                      onChange={(e) => setProjectDetails(e.target.value)}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 min-h-[150px] text-sm"
+                      placeholder="URL: &#10;Username: &#10;Password: "
+                    />
+                  </div>
                 </div>
-              ) : null}
+              ) : (
+                <div className="text-gray-300 whitespace-pre-wrap text-sm min-h-[60px] sm:min-h-[100px] max-h-[72px] sm:max-h-none overflow-hidden sm:overflow-visible relative">
+                  {projectDetails || 'No project details added yet. Click Edit to add details.'}
+                  <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white/10 to-transparent sm:hidden pointer-events-none"></div>
+                </div>
+              )}
             </div>
-            {isEditingDetails ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Project Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400"
-                    placeholder="Enter project name"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    value={editedDescription}
-                    onChange={(e) => setEditedDescription(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400"
-                    placeholder="Enter project description"
-                    rows={3}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Additional Details
-                  </label>
-                  <textarea
-                    value={projectDetails}
-                    onChange={(e) => setProjectDetails(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 min-h-[150px] text-sm"
-                    placeholder="URL: &#10;Username: &#10;Password: "
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="text-gray-300 whitespace-pre-wrap text-sm min-h-[60px] sm:min-h-[100px] max-h-[72px] sm:max-h-none overflow-hidden sm:overflow-visible relative">
-                {projectDetails || 'No project details added yet. Click Edit to add details.'}
-                <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white/10 to-transparent sm:hidden pointer-events-none"></div>
-              </div>
-            )}
-          </div>
 
-          {/* Current Status Section */}
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Current Status</h2>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-1 sm:gap-3">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20">
-                <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Total Bugs:</span>
-                <span className="text-lg sm:text-xl md:text-2xl font-bold text-white">{bugs.length}</span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20">
-                <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Open Bugs:</span>
-                <span className="text-lg sm:text-xl md:text-2xl font-bold text-red-400">
-                  {bugs.filter(bug => bug.status.toLowerCase() === 'open' || bug.status.toLowerCase() === 'reopened').length}
-                </span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20">
-                <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Closed Bugs:</span>
-                <span className="text-lg sm:text-xl md:text-2xl font-bold text-green-400">
-                  {bugs.filter(bug => bug.status.toLowerCase() === 'closed').length}
-                </span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20 sm:border-b-0">
-                <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Out of Scope:</span>
-                <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-400">
-                  {bugs.filter(bug => bug.status.toLowerCase() === 'out of scope').length}
-                </span>
+            {/* Current Status Section */}
+            <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Current Status</h2>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-1 sm:gap-3">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20">
+                  <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Total Bugs:</span>
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-white">{bugs.length}</span>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20">
+                  <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Open Bugs:</span>
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-red-400">
+                    {bugs.filter(bug => bug.status.toLowerCase() === 'open' || bug.status.toLowerCase() === 'reopened').length}
+                  </span>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20">
+                  <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Closed Bugs:</span>
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-green-400">
+                    {bugs.filter(bug => bug.status.toLowerCase() === 'closed').length}
+                  </span>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20 sm:border-b-0">
+                  <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Out of Scope:</span>
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-400">
+                    {bugs.filter(bug => bug.status.toLowerCase() === 'out of scope').length}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Bug Forms */}
-        {showBugForm && (
-          <BugForm
-            projectId={resolvedParams.id}
-            onSubmit={handleCreateBug}
-            onCancel={() => setShowBugForm(false)}
-          />
-        )}
+          {/* Bug Forms */}
+          {showBugForm && (
+            <BugForm
+              projectId={resolvedParams.id}
+              onSubmit={handleCreateBug}
+              onCancel={() => setShowBugForm(false)}
+            />
+          )}
 
-        {editingBug && (
-          <BugForm
-            projectId={resolvedParams.id}
-            bug={editingBug}
-            onSubmit={(bugData) => handleUpdateBug(editingBug.id, bugData)}
-            onCancel={() => setEditingBug(null)}
-          />
-        )}
+          {editingBug && (
+            <BugForm
+              projectId={resolvedParams.id}
+              bug={editingBug}
+              onSubmit={(bugData) => handleUpdateBug(editingBug.id, bugData)}
+              onCancel={() => setEditingBug(null)}
+            />
+          )}
 
-        {/* Action Buttons and Search Bar */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6 items-stretch sm:items-center">
-          {/* Left Side - Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 flex-1 sm:flex-none">
-            {/* Add Bug Button */}
-            <button
-              onClick={() => setShowBugForm(true)}
-              className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
-            >
-              <span>+</span>
-              <span>Add Bug</span>
-            </button>
+          {/* Action Buttons and Search Bar */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6 items-stretch sm:items-center">
+            {/* Left Side - Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 flex-1 sm:flex-none">
+              {/* Add Bug Button */}
+              <button
+                onClick={() => setShowBugForm(true)}
+                className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
+              >
+                <span>+</span>
+                <span>Add Bug</span>
+              </button>
 
-          {/* Edit Dropdowns Button - Available for all users */}
-          <button
-            onClick={() => {
-              setShowEditDropdowns(!showEditDropdowns)
-              setShowFilterDropdown(false)
-            }}
-            className="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
-          >
-            <span>Edit Dropdowns</span>
-            {showEditDropdowns ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
-          </button>
-
-          {/* Filter View Button */}
-          <button
-            onClick={() => {
-              setShowFilterDropdown(!showFilterDropdown)
-              setShowEditDropdowns(false)
-            }}
-            className="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
-          >
-            <span>Filter View</span>
-            {showFilterDropdown ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
-          </button>
-          </div>
-
-          {/* Right Side - Search Bar */}
-          <div className="flex-1 sm:flex-none w-full sm:w-auto">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <input
-                type="text"
-                placeholder="Search bugs..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-10 py-2 sm:py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm sm:text-base"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  <svg className="w-5 h-5 text-gray-400 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              {/* Edit Dropdowns Button - Available for all users */}
+              <button
+                onClick={() => {
+                  setShowEditDropdowns(!showEditDropdowns)
+                  setShowFilterDropdown(false)
+                }}
+                className="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
+              >
+                <span>Edit Dropdowns</span>
+                {showEditDropdowns ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                   </svg>
-                </button>
-              )}
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Filter View Button */}
+              <button
+                onClick={() => {
+                  setShowFilterDropdown(!showFilterDropdown)
+                  setShowEditDropdowns(false)
+                }}
+                className="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base flex items-center justify-center gap-2"
+              >
+                <span>Filter View</span>
+                {showFilterDropdown ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                )}
+              </button>
             </div>
-            {searchQuery && (
-              <div className="mt-1 text-xs text-gray-400">
-                {filteredBugs.length} {filteredBugs.length === 1 ? 'bug' : 'bugs'} found
-              </div>
-            )}
-          </div>
-        </div>
 
-        {/* Filter View Dropdown - Expands Below */}
-        {showFilterDropdown && (
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6">
-            <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base sm:text-lg font-semibold text-white">Filter Bugs</h3>
-              {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all' || searchQuery) && (
-                <button
-                  onClick={() => {
-                    setFilterPortal('all')
-                    setFilterStatus('all')
-                    setFilterPriority('all')
-                    setFilterAssignedTo('all')
-                    setSearchQuery('')
-                  }}
-                      className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                      Clear All
-                </button>
-              )}
-            </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              {/* Portal Filter */}
-              <div>
-                    <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Portal</label>
-                <select
-                  value={filterPortal}
-                  onChange={(e) => setFilterPortal(e.target.value)}
-                      className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-xs sm:text-sm"
-                      style={{ colorScheme: 'dark' }}
-                    >
-                      <option value="all" className="bg-gray-900 text-white">All</option>
-                  {allPortalOptions.map(portal => (
-                        <option key={portal} value={portal} className="bg-gray-900 text-white">
-                      {portal}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Status Filter */}
-              <div>
-                    <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Status</label>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                      className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-xs sm:text-sm"
-                      style={{ colorScheme: 'dark' }}
-                    >
-                      <option value="all" className="bg-gray-900 text-white">All</option>
-                  {allStatusOptions.map(status => (
-                        <option key={status} value={status} className="bg-gray-900 text-white">
-                      {status}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Priority Filter */}
-              <div>
-                    <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Priority</label>
-                <select
-                  value={filterPriority}
-                  onChange={(e) => setFilterPriority(e.target.value)}
-                      className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-xs sm:text-sm"
-                      style={{ colorScheme: 'dark' }}
-                    >
-                      <option value="all" className="bg-gray-900 text-white">All</option>
-                  {allPriorityOptions.map(priority => (
-                        <option key={priority} value={priority} className="bg-gray-900 text-white">
-                      {priority}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Assigned To Filter */}
-              <div>
-                    <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Assigned To</label>
-                <select
-                  value={filterAssignedTo}
-                  onChange={(e) => setFilterAssignedTo(e.target.value)}
-                      className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-xs sm:text-sm"
-                      style={{ colorScheme: 'dark' }}
-                    >
-                      <option value="all" className="bg-gray-900 text-white">All</option>
-                  {allAssignedToOptions.map(assignedTo => (
-                        <option key={assignedTo} value={assignedTo} className="bg-gray-900 text-white">
-                      {assignedTo}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all' || searchQuery) && (
-                  <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-400">
-                Showing {filteredBugs.length} of {bugs.length} bugs
-                {searchQuery && ` (searching for "${searchQuery}")`}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Edit Dropdowns Section - Expands Below */}
-        {showEditDropdowns && (
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6">
-            <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Edit Custom Dropdown Options</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Portal Options */}
-              <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <h4 className="text-sm font-medium text-gray-300 mb-3">Portal:</h4>
-                <div className="space-y-1 mb-3">
-                  {DEFAULT_PORTAL_OPTIONS.map((option) => (
-                    <div key={option} className="px-3 py-2 bg-white/5 border border-white/10 rounded text-gray-300 text-sm">
-                      {option}
-                    </div>
-                  ))}
-                  {customPortalOptions.map((option) => (
-                    <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
-                      <span>{option}</span>
-                      <button
-                        onClick={() => {
-                          const newOptions = customPortalOptions.filter(o => o !== option)
-                          setCustomPortalOptions(newOptions)
-                          localStorage.setItem(`custom_portal_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                        }}
-                        className="text-red-400 hover:text-red-300 font-medium text-xs"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
+            {/* Right Side - Search Bar */}
+            <div className="flex-1 sm:flex-none w-full sm:w-auto">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
                 </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add new portal option"
-                    className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const value = e.currentTarget.value.trim()
+                <input
+                  type="text"
+                  placeholder="Search bugs..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-10 py-2 sm:py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm sm:text-base"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    <svg className="w-5 h-5 text-gray-400 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              {searchQuery && (
+                <div className="mt-1 text-xs text-gray-400">
+                  {filteredBugs.length} {filteredBugs.length === 1 ? 'bug' : 'bugs'} found
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Filter View Dropdown - Expands Below */}
+          {showFilterDropdown && (
+            <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-white">Filter Bugs</h3>
+                {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all' || searchQuery) && (
+                  <button
+                    onClick={() => {
+                      setFilterPortal('all')
+                      setFilterStatus('all')
+                      setFilterPriority('all')
+                      setFilterAssignedTo('all')
+                      setSearchQuery('')
+                    }}
+                    className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {/* Portal Filter */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Portal</label>
+                  <select
+                    value={filterPortal}
+                    onChange={(e) => setFilterPortal(e.target.value)}
+                    className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-xs sm:text-sm"
+                    style={{ colorScheme: 'dark' }}
+                  >
+                    <option value="all" className="bg-gray-900 text-white">All</option>
+                    {allPortalOptions.map(portal => (
+                      <option key={portal} value={portal} className="bg-gray-900 text-white">
+                        {portal}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Status Filter */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Status</label>
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-xs sm:text-sm"
+                    style={{ colorScheme: 'dark' }}
+                  >
+                    <option value="all" className="bg-gray-900 text-white">All</option>
+                    {allStatusOptions.map(status => (
+                      <option key={status} value={status} className="bg-gray-900 text-white">
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Priority Filter */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Priority</label>
+                  <select
+                    value={filterPriority}
+                    onChange={(e) => setFilterPriority(e.target.value)}
+                    className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-xs sm:text-sm"
+                    style={{ colorScheme: 'dark' }}
+                  >
+                    <option value="all" className="bg-gray-900 text-white">All</option>
+                    {allPriorityOptions.map(priority => (
+                      <option key={priority} value={priority} className="bg-gray-900 text-white">
+                        {priority}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Assigned To Filter */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2">Assigned To</label>
+                  <select
+                    value={filterAssignedTo}
+                    onChange={(e) => setFilterAssignedTo(e.target.value)}
+                    className="w-full px-2 sm:px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white cursor-pointer text-xs sm:text-sm"
+                    style={{ colorScheme: 'dark' }}
+                  >
+                    <option value="all" className="bg-gray-900 text-white">All</option>
+                    {allAssignedToOptions.map(assignedTo => (
+                      <option key={assignedTo} value={assignedTo} className="bg-gray-900 text-white">
+                        {assignedTo}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {(filterPortal !== 'all' || filterStatus !== 'all' || filterPriority !== 'all' || filterAssignedTo !== 'all' || searchQuery) && (
+                <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-400">
+                  Showing {filteredBugs.length} of {bugs.length} bugs
+                  {searchQuery && ` (searching for "${searchQuery}")`}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Edit Dropdowns Section - Expands Below */}
+          {showEditDropdowns && (
+            <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Edit Custom Dropdown Options</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Portal Options */}
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <h4 className="text-sm font-medium text-gray-300 mb-3">Portal:</h4>
+                  <div className="space-y-1 mb-3">
+                    {DEFAULT_PORTAL_OPTIONS.map((option) => (
+                      <div key={option} className="px-3 py-2 bg-white/5 border border-white/10 rounded text-gray-300 text-sm">
+                        {option}
+                      </div>
+                    ))}
+                    {customPortalOptions.map((option) => (
+                      <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
+                        <span>{option}</span>
+                        <button
+                          onClick={() => {
+                            const newOptions = customPortalOptions.filter(o => o !== option)
+                            setCustomPortalOptions(newOptions)
+                            localStorage.setItem(`custom_portal_options_${resolvedParams.id}`, JSON.stringify(newOptions))
+                          }}
+                          className="text-red-400 hover:text-red-300 font-medium text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add new portal option"
+                      className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const value = e.currentTarget.value.trim()
+                          if (value && !DEFAULT_PORTAL_OPTIONS.includes(value) && !customPortalOptions.includes(value)) {
+                            const newOptions = [...customPortalOptions, value]
+                            setCustomPortalOptions(newOptions)
+                            localStorage.setItem(`custom_portal_options_${resolvedParams.id}`, JSON.stringify(newOptions))
+                            e.currentTarget.value = ''
+                          }
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={(e) => {
+                        const input = e.currentTarget.previousElementSibling as HTMLInputElement
+                        const value = input.value.trim()
                         if (value && !DEFAULT_PORTAL_OPTIONS.includes(value) && !customPortalOptions.includes(value)) {
                           const newOptions = [...customPortalOptions, value]
                           setCustomPortalOptions(newOptions)
                           localStorage.setItem(`custom_portal_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                          e.currentTarget.value = ''
+                          input.value = ''
                         }
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={(e) => {
-                      const input = e.currentTarget.previousElementSibling as HTMLInputElement
-                      const value = input.value.trim()
-                      if (value && !DEFAULT_PORTAL_OPTIONS.includes(value) && !customPortalOptions.includes(value)) {
-                        const newOptions = [...customPortalOptions, value]
-                        setCustomPortalOptions(newOptions)
-                        localStorage.setItem(`custom_portal_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                        input.value = ''
-                      }
-                    }}
-                    className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
-                  >
-                    +
-                  </button>
+                      }}
+                      className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Priority Options */}
-              <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <h4 className="text-sm font-medium text-gray-300 mb-3">Priority:</h4>
-                <div className="space-y-1 mb-3">
-                  {DEFAULT_PRIORITY_OPTIONS.map((option) => (
-                    <div key={option} className="px-3 py-2 bg-white/5 border border-white/10 rounded text-gray-300 text-sm">
-                      {option}
-                    </div>
-                  ))}
-                  {customPriorityOptions.map((option) => (
-                    <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
-                      <span>{option}</span>
-                      <button
-                        onClick={() => {
-                          const newOptions = customPriorityOptions.filter(o => o !== option)
-                          setCustomPriorityOptions(newOptions)
-                          localStorage.setItem(`custom_priority_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                        }}
-                        className="text-red-400 hover:text-red-300 font-medium text-xs"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add new priority option"
-                    className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const value = e.currentTarget.value.trim()
+                {/* Priority Options */}
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <h4 className="text-sm font-medium text-gray-300 mb-3">Priority:</h4>
+                  <div className="space-y-1 mb-3">
+                    {DEFAULT_PRIORITY_OPTIONS.map((option) => (
+                      <div key={option} className="px-3 py-2 bg-white/5 border border-white/10 rounded text-gray-300 text-sm">
+                        {option}
+                      </div>
+                    ))}
+                    {customPriorityOptions.map((option) => (
+                      <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
+                        <span>{option}</span>
+                        <button
+                          onClick={() => {
+                            const newOptions = customPriorityOptions.filter(o => o !== option)
+                            setCustomPriorityOptions(newOptions)
+                            localStorage.setItem(`custom_priority_options_${resolvedParams.id}`, JSON.stringify(newOptions))
+                          }}
+                          className="text-red-400 hover:text-red-300 font-medium text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add new priority option"
+                      className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const value = e.currentTarget.value.trim()
+                          if (value && !DEFAULT_PRIORITY_OPTIONS.includes(value) && !customPriorityOptions.includes(value)) {
+                            const newOptions = [...customPriorityOptions, value]
+                            setCustomPriorityOptions(newOptions)
+                            localStorage.setItem(`custom_priority_options_${resolvedParams.id}`, JSON.stringify(newOptions))
+                            e.currentTarget.value = ''
+                          }
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={(e) => {
+                        const input = e.currentTarget.previousElementSibling as HTMLInputElement
+                        const value = input.value.trim()
                         if (value && !DEFAULT_PRIORITY_OPTIONS.includes(value) && !customPriorityOptions.includes(value)) {
                           const newOptions = [...customPriorityOptions, value]
                           setCustomPriorityOptions(newOptions)
                           localStorage.setItem(`custom_priority_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                          e.currentTarget.value = ''
+                          input.value = ''
                         }
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={(e) => {
-                      const input = e.currentTarget.previousElementSibling as HTMLInputElement
-                      const value = input.value.trim()
-                      if (value && !DEFAULT_PRIORITY_OPTIONS.includes(value) && !customPriorityOptions.includes(value)) {
-                        const newOptions = [...customPriorityOptions, value]
-                        setCustomPriorityOptions(newOptions)
-                        localStorage.setItem(`custom_priority_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                        input.value = ''
-                      }
-                    }}
-                    className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
-                  >
-                    +
-                  </button>
+                      }}
+                      className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Status Options */}
-              <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <h4 className="text-sm font-medium text-gray-300 mb-3">Status:</h4>
-                <div className="space-y-1 mb-3">
-                  {DEFAULT_STATUS_OPTIONS.map((option) => (
-                    <div key={option} className="px-3 py-2 bg-white/5 border border-white/10 rounded text-gray-300 text-sm">
-                      {option}
-                    </div>
-                  ))}
-                  {customStatusOptions.map((option) => (
-                    <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
-                      <span>{option}</span>
-                      <button
-                        onClick={() => {
-                          const newOptions = customStatusOptions.filter(o => o !== option)
-                          setCustomStatusOptions(newOptions)
-                          localStorage.setItem(`custom_status_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                        }}
-                        className="text-red-400 hover:text-red-300 font-medium text-xs"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add new status option"
-                    className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const value = e.currentTarget.value.trim()
+                {/* Status Options */}
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <h4 className="text-sm font-medium text-gray-300 mb-3">Status:</h4>
+                  <div className="space-y-1 mb-3">
+                    {DEFAULT_STATUS_OPTIONS.map((option) => (
+                      <div key={option} className="px-3 py-2 bg-white/5 border border-white/10 rounded text-gray-300 text-sm">
+                        {option}
+                      </div>
+                    ))}
+                    {customStatusOptions.map((option) => (
+                      <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
+                        <span>{option}</span>
+                        <button
+                          onClick={() => {
+                            const newOptions = customStatusOptions.filter(o => o !== option)
+                            setCustomStatusOptions(newOptions)
+                            localStorage.setItem(`custom_status_options_${resolvedParams.id}`, JSON.stringify(newOptions))
+                          }}
+                          className="text-red-400 hover:text-red-300 font-medium text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add new status option"
+                      className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const value = e.currentTarget.value.trim()
+                          if (value && !DEFAULT_STATUS_OPTIONS.includes(value) && !customStatusOptions.includes(value)) {
+                            const newOptions = [...customStatusOptions, value]
+                            setCustomStatusOptions(newOptions)
+                            localStorage.setItem(`custom_status_options_${resolvedParams.id}`, JSON.stringify(newOptions))
+                            e.currentTarget.value = ''
+                          }
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={(e) => {
+                        const input = e.currentTarget.previousElementSibling as HTMLInputElement
+                        const value = input.value.trim()
                         if (value && !DEFAULT_STATUS_OPTIONS.includes(value) && !customStatusOptions.includes(value)) {
                           const newOptions = [...customStatusOptions, value]
                           setCustomStatusOptions(newOptions)
                           localStorage.setItem(`custom_status_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                          e.currentTarget.value = ''
+                          input.value = ''
                         }
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={(e) => {
-                      const input = e.currentTarget.previousElementSibling as HTMLInputElement
-                      const value = input.value.trim()
-                      if (value && !DEFAULT_STATUS_OPTIONS.includes(value) && !customStatusOptions.includes(value)) {
-                        const newOptions = [...customStatusOptions, value]
-                        setCustomStatusOptions(newOptions)
-                        localStorage.setItem(`custom_status_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                        input.value = ''
-                      }
-                    }}
-                    className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
-                  >
-                    +
-                  </button>
+                      }}
+                      className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Assigned To Options */}
-              <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <h4 className="text-sm font-medium text-gray-300 mb-3">Assigned To:</h4>
-                <div className="space-y-1 mb-3">
-                  {DEFAULT_ASSIGNED_TO_OPTIONS.map((option) => (
-                    <div key={option} className="px-3 py-2 bg-white/5 border border-white/10 rounded text-gray-300 text-sm">
-                      {option}
-                    </div>
-                  ))}
-                  {customAssignedToOptions.map((option) => (
-                    <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
-                      <span>{option}</span>
-                      <button
-                        onClick={() => {
-                          const newOptions = customAssignedToOptions.filter(o => o !== option)
-                          setCustomAssignedToOptions(newOptions)
-                          localStorage.setItem(`custom_assigned_to_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                        }}
-                        className="text-red-400 hover:text-red-300 font-medium text-xs"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add new assigned to option"
-                    className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const value = e.currentTarget.value.trim()
+                {/* Assigned To Options */}
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <h4 className="text-sm font-medium text-gray-300 mb-3">Assigned To:</h4>
+                  <div className="space-y-1 mb-3">
+                    {DEFAULT_ASSIGNED_TO_OPTIONS.map((option) => (
+                      <div key={option} className="px-3 py-2 bg-white/5 border border-white/10 rounded text-gray-300 text-sm">
+                        {option}
+                      </div>
+                    ))}
+                    {customAssignedToOptions.map((option) => (
+                      <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
+                        <span>{option}</span>
+                        <button
+                          onClick={() => {
+                            const newOptions = customAssignedToOptions.filter(o => o !== option)
+                            setCustomAssignedToOptions(newOptions)
+                            localStorage.setItem(`custom_assigned_to_options_${resolvedParams.id}`, JSON.stringify(newOptions))
+                          }}
+                          className="text-red-400 hover:text-red-300 font-medium text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add new assigned to option"
+                      className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const value = e.currentTarget.value.trim()
+                          if (value && !DEFAULT_ASSIGNED_TO_OPTIONS.includes(value) && !customAssignedToOptions.includes(value)) {
+                            const newOptions = [...customAssignedToOptions, value]
+                            setCustomAssignedToOptions(newOptions)
+                            localStorage.setItem(`custom_assigned_to_options_${resolvedParams.id}`, JSON.stringify(newOptions))
+                            e.currentTarget.value = ''
+                          }
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={(e) => {
+                        const input = e.currentTarget.previousElementSibling as HTMLInputElement
+                        const value = input.value.trim()
                         if (value && !DEFAULT_ASSIGNED_TO_OPTIONS.includes(value) && !customAssignedToOptions.includes(value)) {
                           const newOptions = [...customAssignedToOptions, value]
                           setCustomAssignedToOptions(newOptions)
                           localStorage.setItem(`custom_assigned_to_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                          e.currentTarget.value = ''
+                          input.value = ''
                         }
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={(e) => {
-                      const input = e.currentTarget.previousElementSibling as HTMLInputElement
-                      const value = input.value.trim()
-                      if (value && !DEFAULT_ASSIGNED_TO_OPTIONS.includes(value) && !customAssignedToOptions.includes(value)) {
-                        const newOptions = [...customAssignedToOptions, value]
-                        setCustomAssignedToOptions(newOptions)
-                        localStorage.setItem(`custom_assigned_to_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                        input.value = ''
-                      }
-                    }}
-                    className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
-                  >
-                    +
-                  </button>
+                      }}
+                      className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Bug Display - Table View (All Screen Sizes) */}
-        {bugs.length === 0 ? (
-          <div className="text-center py-12 backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20">
-            <div className="text-gray-300 text-base sm:text-lg mb-4">No bugs reported yet</div>
-            <button
-              onClick={() => setShowBugForm(true)}
-              className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base"
-            >
-              Report First Bug
-            </button>
-          </div>
-        ) : (
-          <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 overflow-x-auto">
-            <div className="overflow-y-auto overflow-x-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
-              <table className="w-full divide-y divide-white/20 min-w-full">
-                <thead className="bg-black sticky top-0 z-10 shadow-md border-b border-white/20">
-                <tr>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[80px]">
-                    Bug ID
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[90px]">
-                    Portal
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-center text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[80px]">
-                    Priority
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[120px]">
-                    Bug Title
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[250px]">
-                    Bug Description
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-center text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[100px]">
-                    Status
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[90px]">
-                    Assigned To
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap w-[70px]">
-                    Reference
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[200px]">
-                    Client Notes
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[200px]">
-                    Developer Notes
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[90px]">
-                    Date Added
-                  </th>
-                  <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[100px]">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-transparent divide-y divide-white/10">
-                {filteredBugs.length === 0 ? (
-                  <tr>
-                    <td colSpan={12} className="px-2 sm:px-3 py-8 text-center">
-                      <div className="text-gray-400 text-lg mb-2">
-                        {searchQuery 
-                          ? `No bugs found matching "${searchQuery}"`
-                          : 'No bugs match the selected filters'}
-                      </div>
-                      <button
-                        onClick={() => {
-                          setFilterPortal('all')
-                          setFilterStatus('all')
-                          setFilterPriority('all')
-                          setFilterAssignedTo('all')
-                          setSearchQuery('')
-                        }}
-                        className="text-[#1e316d] bg-white/90 hover:bg-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-                      >
-                        Clear Filters & Search
-                      </button>
-                    </td>
-                  </tr>
-                ) : filteredBugs.map((bug) => (
-                  <tr 
-                    key={bug.id} 
-                    className="hover:bg-white/5 cursor-pointer transition-colors"
-                    onClick={() => setViewingBug(bug)}
-                  >
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium text-white whitespace-nowrap">
-                      <div className="break-words">{bug.bug_id}</div>
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
-                      <span className={`inline-flex items-center justify-center text-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal break-words max-w-[100px] ${getPortalColor(bug.portal)}`}>
-                        {bug.portal}
-                      </span>
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
-                      <span className={`inline-flex items-center justify-center text-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal break-words max-w-[100px] ${getPriorityColor(bug.priority)}`}>
-                        {bug.priority}
-                      </span>
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-white">
-                      <div className="break-words line-clamp-2 max-w-[120px]">
-                        {bug.module_feature || '-'}
-                      </div>
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
-                      <div className="break-words line-clamp-3 max-w-[250px]">
-                        {bug.bug_description || '-'}
-                      </div>
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
-                      <span className={`inline-flex items-center justify-center text-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal break-words max-w-[120px] ${getStatusColor(bug.status)}`}>
-                        {bug.status}
-                      </span>
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
-                      <span className={`inline-flex items-center justify-center text-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal break-words max-w-[100px] ${getAssignedToColor(bug.assigned_to)}`}>
-                        {bug.assigned_to}
-                      </span>
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
-                      {bug.attachments && bug.attachments.length > 0 ? (
-                        <div className="flex flex-row gap-1 items-center justify-start">
-                          {bug.attachments
-                            .slice()
-                            .reverse()
-                            .slice(0, 2)
-                            .map((attachment, idx) => (
-                              <FileTypeIcon
-                                key={idx}
-                                type={getFileType(attachment)}
-                                url={attachment.url}
-                                name={attachment.name}
-                              />
-                            ))}
-                        </div>
-                      ) : '-'}
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
-                      {bug.client_notes && Array.isArray(bug.client_notes) && bug.client_notes.length > 0 ? (
-                        (() => {
-                          const sortedNotes = [...bug.client_notes].sort((a, b) => 
-                            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-                          )
-                          const latestNote = sortedNotes[0]
-                          return (
-                            <div className="break-words line-clamp-3 max-w-[200px]" title={latestNote.note}>
-                              {latestNote.note}
-                      </div>
-                          )
-                        })()
-                      ) : '-'}
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
-                      {bug.developer_notes && Array.isArray(bug.developer_notes) && bug.developer_notes.length > 0 ? (
-                        (() => {
-                          const sortedNotes = [...bug.developer_notes].sort((a, b) => 
-                            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-                          )
-                          const latestNote = sortedNotes[0]
-                          return (
-                            <div className="break-words line-clamp-3 max-w-[200px]" title={latestNote.note}>
-                              {latestNote.note}
-                      </div>
-                          )
-                        })()
-                      ) : '-'}
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300 whitespace-nowrap">
-                      <div className="break-words">{formatDate(bug.date_added)}</div>
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium whitespace-nowrap">
-                      <div className="flex flex-col space-y-1">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setEditingBug(bug)
-                          }}
-                          className="text-blue-400 hover:text-blue-300 text-left text-xs sm:text-sm"
-                        >
-                          Edit
-                        </button>
-                        {isAuthenticated && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleDeleteBug(bug.id)
-                            }}
-                            className="text-red-400 hover:text-red-300 text-left text-xs sm:text-sm"
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Bug Display - Table View (All Screen Sizes) */}
+          {bugs.length === 0 ? (
+            <div className="text-center py-12 backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20">
+              <div className="text-gray-300 text-base sm:text-lg mb-4">No bugs reported yet</div>
+              <button
+                onClick={() => setShowBugForm(true)}
+                className="bg-[#1e316d] hover:bg-[#2a4494] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors shadow-lg text-sm sm:text-base"
+              >
+                Report First Bug
+              </button>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 overflow-hidden">
+              <div className="overflow-y-auto overflow-x-auto overscroll-x-none" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+                <table className="w-full divide-y divide-white/20 min-w-full">
+                  <thead className="bg-black sticky top-0 z-10 shadow-md border-b border-white/20">
+                    <tr>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[80px]">
+                        Bug ID
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[90px]">
+                        Portal
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-center text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[80px]">
+                        Priority
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[120px]">
+                        Bug Title
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[250px]">
+                        Bug Description
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-center text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[100px]">
+                        Status
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[90px]">
+                        Assigned To
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap w-[70px]">
+                        Reference
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[200px]">
+                        Client Notes
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[200px]">
+                        Developer Notes
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[90px]">
+                        Date Added
+                      </th>
+                      <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap min-w-[100px]">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-transparent divide-y divide-white/10">
+                    {filteredBugs.length === 0 ? (
+                      <tr>
+                        <td colSpan={12} className="px-2 sm:px-3 py-8 text-center">
+                          <div className="text-gray-400 text-lg mb-2">
+                            {searchQuery
+                              ? `No bugs found matching "${searchQuery}"`
+                              : 'No bugs match the selected filters'}
+                          </div>
+                          <button
+                            onClick={() => {
+                              setFilterPortal('all')
+                              setFilterStatus('all')
+                              setFilterPriority('all')
+                              setFilterAssignedTo('all')
+                              setSearchQuery('')
+                            }}
+                            className="text-[#1e316d] bg-white/90 hover:bg-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                          >
+                            Clear Filters & Search
+                          </button>
+                        </td>
+                      </tr>
+                    ) : filteredBugs.map((bug) => (
+                      <tr
+                        key={bug.id}
+                        className="hover:bg-white/5 cursor-pointer transition-colors"
+                        onClick={() => setViewingBug(bug)}
+                      >
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium text-white whitespace-nowrap">
+                          <div className="break-words">{bug.bug_id}</div>
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
+                          <span className={`inline-flex items-center justify-center text-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal break-words max-w-[100px] ${getPortalColor(bug.portal)}`}>
+                            {bug.portal}
+                          </span>
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
+                          <span className={`inline-flex items-center justify-center text-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal break-words max-w-[100px] ${getPriorityColor(bug.priority)}`}>
+                            {bug.priority}
+                          </span>
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-white">
+                          <div className="break-words line-clamp-2 max-w-[120px]">
+                            {bug.module_feature || '-'}
+                          </div>
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
+                          <div className="break-words line-clamp-3 max-w-[250px]">
+                            {bug.bug_description || '-'}
+                          </div>
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
+                          <span className={`inline-flex items-center justify-center text-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal break-words max-w-[120px] ${getStatusColor(bug.status)}`}>
+                            {bug.status}
+                          </span>
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
+                          <span className={`inline-flex items-center justify-center text-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal break-words max-w-[100px] ${getAssignedToColor(bug.assigned_to)}`}>
+                            {bug.assigned_to}
+                          </span>
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
+                          {bug.attachments && bug.attachments.length > 0 ? (
+                            <div className="flex flex-row gap-1 items-center justify-start">
+                              {bug.attachments
+                                .slice()
+                                .reverse()
+                                .slice(0, 2)
+                                .map((attachment, idx) => (
+                                  <FileTypeIcon
+                                    key={idx}
+                                    type={getFileType(attachment)}
+                                    url={attachment.url}
+                                    name={attachment.name}
+                                  />
+                                ))}
+                            </div>
+                          ) : '-'}
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
+                          {bug.client_notes && Array.isArray(bug.client_notes) && bug.client_notes.length > 0 ? (
+                            (() => {
+                              const sortedNotes = [...bug.client_notes].sort((a, b) =>
+                                new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                              )
+                              const latestNote = sortedNotes[0]
+                              return (
+                                <div className="break-words line-clamp-3 max-w-[200px]" title={latestNote.note}>
+                                  {latestNote.note}
+                                </div>
+                              )
+                            })()
+                          ) : '-'}
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
+                          {bug.developer_notes && Array.isArray(bug.developer_notes) && bug.developer_notes.length > 0 ? (
+                            (() => {
+                              const sortedNotes = [...bug.developer_notes].sort((a, b) =>
+                                new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                              )
+                              const latestNote = sortedNotes[0]
+                              return (
+                                <div className="break-words line-clamp-3 max-w-[200px]" title={latestNote.note}>
+                                  {latestNote.note}
+                                </div>
+                              )
+                            })()
+                          ) : '-'}
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-gray-300 whitespace-nowrap">
+                          <div className="break-words">{formatDate(bug.date_added)}</div>
+                        </td>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium whitespace-nowrap">
+                          <div className="flex flex-col space-y-1">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setEditingBug(bug)
+                              }}
+                              className="text-blue-400 hover:text-blue-300 text-left text-xs sm:text-sm"
+                            >
+                              Edit
+                            </button>
+                            {isAuthenticated && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleDeleteBug(bug.id)
+                                }}
+                                className="text-red-400 hover:text-red-300 text-left text-xs sm:text-sm"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
-        {/* Bug Details Popup */}
-        {viewingBug && (
-          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-            <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 max-w-4xl w-full max-h-[90vh] flex flex-col">
-              <div className="flex justify-between items-start p-4 sm:p-6 border-b border-white/20 flex-shrink-0">
-                <h2 className="text-xl sm:text-2xl font-semibold text-white">Bug Details</h2>
+          {/* Bug Details Popup */}
+          {viewingBug && (
+            <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+              <div className="backdrop-blur-md bg-white/10 rounded-lg shadow-xl border border-white/20 max-w-4xl w-full max-h-[90vh] flex flex-col">
+                <div className="flex justify-between items-start p-4 sm:p-6 border-b border-white/20 flex-shrink-0">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-white">Bug Details</h2>
                   <button
                     onClick={() => setViewingBug(null)}
-                  className="text-gray-400 hover:text-white text-xl sm:text-2xl leading-none"
+                    className="text-gray-400 hover:text-white text-xl sm:text-2xl leading-none"
                   >
                     ×
                   </button>
-              </div>
-
-              <div className="space-y-4 p-4 sm:p-6 overflow-y-auto flex-grow">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Bug ID</label>
-                    <div className="text-white font-semibold text-base sm:text-lg">{viewingBug.bug_id}</div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Portal</label>
-                    <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal ${getPortalColor(viewingBug.portal)}`}>
-                      {viewingBug.portal}
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Priority</label>
-                    <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal ${getPriorityColor(viewingBug.priority)}`}>
-                      {viewingBug.priority}
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
-                    <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal ${getStatusColor(viewingBug.status)}`}>
-                      {viewingBug.status}
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Assigned To</label>
-                    <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal ${getAssignedToColor(viewingBug.assigned_to)}`}>
-                      {viewingBug.assigned_to}
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Date Added</label>
-                    <div className="text-white">{formatDate(viewingBug.date_added)}</div>
-                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Bug Title</label>
-                  <div className="text-white bg-white/5 p-3 rounded border border-white/20 text-sm sm:text-base">
-                    {viewingBug.module_feature || '-'}
-                  </div>
-                </div>
+                <div className="space-y-4 p-4 sm:p-6 overflow-y-auto flex-grow">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Bug ID</label>
+                      <div className="text-white font-semibold text-base sm:text-lg">{viewingBug.bug_id}</div>
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Bug Description</label>
-                  <div className="text-white bg-white/5 p-3 rounded border border-white/20 whitespace-pre-wrap text-sm sm:text-base">
-                    {viewingBug.bug_description || '-'}
-                  </div>
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Portal</label>
+                      <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal ${getPortalColor(viewingBug.portal)}`}>
+                        {viewingBug.portal}
+                      </span>
+                    </div>
 
-                {viewingBug.attachments && viewingBug.attachments.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Priority</label>
+                      <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal ${getPriorityColor(viewingBug.priority)}`}>
+                        {viewingBug.priority}
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
+                      <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal ${getStatusColor(viewingBug.status)}`}>
+                        {viewingBug.status}
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Assigned To</label>
+                      <span className={`inline-flex items-center justify-center text-center px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full whitespace-normal ${getAssignedToColor(viewingBug.assigned_to)}`}>
+                        {viewingBug.assigned_to}
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Date Added</label>
+                      <div className="text-white">{formatDate(viewingBug.date_added)}</div>
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Attachments ({viewingBug.attachments.length})</label>
-                    <div className="space-y-2">
-                      {viewingBug.attachments.map((attachment, index) => (
-                        <div key={index} className="flex items-center justify-between bg-white/5 border border-white/20 rounded-lg p-3">
-                          <div className="flex items-center space-x-3 flex-1 min-w-0">
-                            <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-white text-sm sm:text-base truncate">{attachment.name}</div>
-                              <div className="text-gray-400 text-xs">
-                                {(attachment.size / 1024).toFixed(2)} KB
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Bug Title</label>
+                    <div className="text-white bg-white/5 p-3 rounded border border-white/20 text-sm sm:text-base">
+                      {viewingBug.module_feature || '-'}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Bug Description</label>
+                    <div className="text-white bg-white/5 p-3 rounded border border-white/20 whitespace-pre-wrap text-sm sm:text-base">
+                      {viewingBug.bug_description || '-'}
+                    </div>
+                  </div>
+
+                  {viewingBug.attachments && viewingBug.attachments.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Attachments ({viewingBug.attachments.length})</label>
+                      <div className="space-y-2">
+                        {viewingBug.attachments.map((attachment, index) => (
+                          <div key={index} className="flex items-center justify-between bg-white/5 border border-white/20 rounded-lg p-3">
+                            <div className="flex items-center space-x-3 flex-1 min-w-0">
+                              <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              </svg>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-white text-sm sm:text-base truncate">{attachment.name}</div>
+                                <div className="text-gray-400 text-xs">
+                                  {(attachment.size / 1024).toFixed(2)} KB
+                                </div>
                               </div>
                             </div>
+                            <a
+                              href={attachment.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="ml-3 flex-shrink-0 bg-[#1e316d] hover:bg-[#2a4494] text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              View
+                            </a>
                           </div>
-                          <a
-                            href={attachment.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                            className="ml-3 flex-shrink-0 bg-[#1e316d] hover:bg-[#2a4494] text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                    >
-                            View
-                    </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {viewingBug.client_notes && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Client Notes
+                      </label>
+                      {Array.isArray(viewingBug.client_notes) && viewingBug.client_notes.length > 0 ? (
+                        <>
+                          {(() => {
+                            // Sort oldest to newest for numbering (oldest = Note 1)
+                            const sortedAsc = [...viewingBug.client_notes].sort((a, b) =>
+                              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+                            )
+                            // Reverse for display (latest first)
+                            const sortedDesc = [...sortedAsc].reverse()
+                            const latestNote = sortedDesc[0]
+                            const previousNotes = sortedDesc.slice(1)
+                            const totalNotes = sortedAsc.length
+
+                            return (
+                              <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-2">
+                                <div className="text-xs text-gray-400 mb-1">
+                                  Note {totalNotes} - {formatNoteDate(latestNote.timestamp)}
+                                </div>
+                                <div className="text-white whitespace-pre-wrap text-sm sm:text-base">
+                                  {latestNote.note}
+                                </div>
+                              </div>
+                            )
+                          })()}
+                        </>
+                      ) : (
+                        <div className="text-white bg-purple-900/30 p-3 rounded border border-purple-500/30 whitespace-pre-wrap text-sm sm:text-base">
+                          -
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {viewingBug.client_notes && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Client Notes
-                    </label>
-                    {Array.isArray(viewingBug.client_notes) && viewingBug.client_notes.length > 0 ? (
-                      <>
-                        {(() => {
-                          // Sort oldest to newest for numbering (oldest = Note 1)
-                          const sortedAsc = [...viewingBug.client_notes].sort((a, b) => 
-                            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-                          )
-                          // Reverse for display (latest first)
-                          const sortedDesc = [...sortedAsc].reverse()
-                          const latestNote = sortedDesc[0]
-                          const previousNotes = sortedDesc.slice(1)
-                          const totalNotes = sortedAsc.length
-                          
-                          return (
-                            <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-2">
-                              <div className="text-xs text-gray-400 mb-1">
-                                Note {totalNotes} - {formatNoteDate(latestNote.timestamp)}
-                    </div>
-                              <div className="text-white whitespace-pre-wrap text-sm sm:text-base">
-                                {latestNote.note}
+                  {viewingBug.developer_notes && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Developer Notes
+                      </label>
+                      {Array.isArray(viewingBug.developer_notes) && viewingBug.developer_notes.length > 0 ? (
+                        <>
+                          {(() => {
+                            // Sort oldest to newest for numbering (oldest = Note 1)
+                            const sortedAsc = [...viewingBug.developer_notes].sort((a, b) =>
+                              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+                            )
+                            // Reverse for display (latest first)
+                            const sortedDesc = [...sortedAsc].reverse()
+                            const latestNote = sortedDesc[0]
+                            const previousNotes = sortedDesc.slice(1)
+                            const totalNotes = sortedAsc.length
+
+                            return (
+                              <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-2">
+                                <div className="text-xs text-gray-400 mb-1">
+                                  Note {totalNotes} - {formatNoteDate(latestNote.timestamp)}
+                                </div>
+                                <div className="text-white whitespace-pre-wrap text-sm sm:text-base">
+                                  {latestNote.note}
+                                </div>
                               </div>
-                            </div>
-                          )
-                        })()}
-                      </>
-                    ) : (
-                      <div className="text-white bg-purple-900/30 p-3 rounded border border-purple-500/30 whitespace-pre-wrap text-sm sm:text-base">
-                        -
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {viewingBug.developer_notes && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Developer Notes
-                    </label>
-                    {Array.isArray(viewingBug.developer_notes) && viewingBug.developer_notes.length > 0 ? (
-                      <>
-                        {(() => {
-                          // Sort oldest to newest for numbering (oldest = Note 1)
-                          const sortedAsc = [...viewingBug.developer_notes].sort((a, b) => 
-                            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-                          )
-                          // Reverse for display (latest first)
-                          const sortedDesc = [...sortedAsc].reverse()
-                          const latestNote = sortedDesc[0]
-                          const previousNotes = sortedDesc.slice(1)
-                          const totalNotes = sortedAsc.length
-                          
-                          return (
-                            <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-2">
-                              <div className="text-xs text-gray-400 mb-1">
-                                Note {totalNotes} - {formatNoteDate(latestNote.timestamp)}
+                            )
+                          })()}
+                        </>
+                      ) : (
+                        <div className="text-white bg-yellow-900/30 p-3 rounded border border-yellow-500/30 whitespace-pre-wrap text-sm sm:text-base">
+                          -
+                        </div>
+                      )}
                     </div>
-                              <div className="text-white whitespace-pre-wrap text-sm sm:text-base">
-                                {latestNote.note}
-                              </div>
-                            </div>
-                          )
-                        })()}
-                      </>
-                    ) : (
-                      <div className="text-white bg-yellow-900/30 p-3 rounded border border-yellow-500/30 whitespace-pre-wrap text-sm sm:text-base">
-                        -
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              <div className="flex justify-end space-x-3 p-4 sm:p-6 border-t border-white/20 flex-shrink-0">
-                {isAuthenticated && (
+                <div className="flex justify-end space-x-3 p-4 sm:p-6 border-t border-white/20 flex-shrink-0">
+                  {isAuthenticated && (
+                    <button
+                      onClick={() => {
+                        if (confirm('Are you sure you want to delete this bug?')) {
+                          handleDeleteBug(viewingBug.id)
+                          setViewingBug(null)
+                        }
+                      }}
+                      className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white border border-red-500/30 rounded-lg font-medium transition-colors text-sm sm:text-base"
+                    >
+                      Delete Bug
+                    </button>
+                  )}
                   <button
                     onClick={() => {
-                      if (confirm('Are you sure you want to delete this bug?')) {
-                        handleDeleteBug(viewingBug.id)
-                        setViewingBug(null)
-                      }
+                      setViewingBug(null)
+                      setEditingBug(viewingBug)
                     }}
-                    className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white border border-red-500/30 rounded-lg font-medium transition-colors text-sm sm:text-base"
+                    className="px-3 sm:px-4 py-2 bg-[#1e316d] hover:bg-[#2a4494] text-white border border-[#1e316d]/30 rounded-lg font-medium transition-colors text-sm sm:text-base"
                   >
-                    Delete Bug
+                    Edit Bug
                   </button>
-                )}
-                <button
-                  onClick={() => {
-                    setViewingBug(null)
-                    setEditingBug(viewingBug)
-                  }}
-                  className="px-3 sm:px-4 py-2 bg-[#1e316d] hover:bg-[#2a4494] text-white border border-[#1e316d]/30 rounded-lg font-medium transition-colors text-sm sm:text-base"
-                >
-                  Edit Bug
-                </button>
-                <button
-                  onClick={() => setViewingBug(null)}
-                  className="px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg font-medium transition-colors text-sm sm:text-base"
-                >
-                  Close Bug
-                </button>
+                  <button
+                    onClick={() => setViewingBug(null)}
+                    className="px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg font-medium transition-colors text-sm sm:text-base"
+                  >
+                    Close Bug
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
         </div>
       </div>
     </div>
