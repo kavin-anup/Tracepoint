@@ -145,6 +145,29 @@ export type Database = {
           updated_at?: string
         }
       }
+      project_custom_options: {
+        Row: {
+          id: string
+          project_id: string
+          option_type: 'portal' | 'priority' | 'status' | 'assigned_to'
+          option_value: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          option_type: 'portal' | 'priority' | 'status' | 'assigned_to'
+          option_value: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          option_type?: 'portal' | 'priority' | 'status' | 'assigned_to'
+          option_value?: string
+          created_at?: string
+        }
+      }
     }
   }
 }

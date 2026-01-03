@@ -72,24 +72,23 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
     fetchProject()
     fetchBugs()
 
-    // Load custom options from localStorage
+    // Load custom options from database
+    const loadCustomOptions = async () => {
+      const portals = await fetchCustomOptions('portal')
+      const priorities = await fetchCustomOptions('priority')
+      const statuses = await fetchCustomOptions('status')
+      const assignedTo = await fetchCustomOptions('assigned_to')
+
+      setCustomPortalOptions(portals)
+      setCustomPriorityOptions(priorities)
+      setCustomStatusOptions(statuses)
+      setCustomAssignedToOptions(assignedTo)
+    }
+
+    loadCustomOptions()
+
+    // Prevent navigation back to main dashboard
     if (typeof window !== 'undefined') {
-      const portalKey = `custom_portal_options_${resolvedParams.id}`
-      const priorityKey = `custom_priority_options_${resolvedParams.id}`
-      const statusKey = `custom_status_options_${resolvedParams.id}`
-
-      const assignedToKey = `custom_assigned_to_options_${resolvedParams.id}`
-      const storedPortals = localStorage.getItem(portalKey)
-      const storedPriorities = localStorage.getItem(priorityKey)
-      const storedStatuses = localStorage.getItem(statusKey)
-      const storedAssignedTo = localStorage.getItem(assignedToKey)
-
-      setCustomPortalOptions(storedPortals ? JSON.parse(storedPortals) : [])
-      setCustomPriorityOptions(storedPriorities ? JSON.parse(storedPriorities) : [])
-      setCustomStatusOptions(storedStatuses ? JSON.parse(storedStatuses) : [])
-      setCustomAssignedToOptions(storedAssignedTo ? JSON.parse(storedAssignedTo) : [])
-
-      // Prevent navigation back to main dashboard
       // Replace the current history entry to remove the referrer
       if (window.history.length > 1 && document.referrer.includes(window.location.origin)) {
         window.history.replaceState(null, '', window.location.pathname + window.location.search)
@@ -104,6 +103,10 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
       return () => {
         window.removeEventListener('popstate', preventBack)
+        subscription.unsubscribe()
+      }
+    } else {
+      return () => {
         subscription.unsubscribe()
       }
     }
@@ -148,6 +151,58 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
       setBugs(data || [])
     } catch (error) {
       console.error('Error fetching bugs:', error)
+    }
+  }
+
+  const fetchCustomOptions = async (optionType: 'portal' | 'priority' | 'status' | 'assigned_to') => {
+    try {
+      const { data, error } = await supabase
+        .from('project_custom_options')
+        .select('option_value')
+        .eq('project_id', resolvedParams.id)
+        .eq('option_type', optionType)
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+      return (data || []).map(item => item.option_value)
+    } catch (error) {
+      console.error(`Error fetching custom ${optionType} options:`, error)
+      return []
+    }
+  }
+
+  const saveCustomOption = async (optionType: 'portal' | 'priority' | 'status' | 'assigned_to', optionValue: string) => {
+    try {
+      const { error } = await supabase
+        .from('project_custom_options')
+        .insert({
+          project_id: resolvedParams.id,
+          option_type: optionType,
+          option_value: optionValue
+        })
+
+      if (error) throw error
+      return true
+    } catch (error) {
+      console.error(`Error saving custom ${optionType} option:`, error)
+      return false
+    }
+  }
+
+  const deleteCustomOption = async (optionType: 'portal' | 'priority' | 'status' | 'assigned_to', optionValue: string) => {
+    try {
+      const { error } = await supabase
+        .from('project_custom_options')
+        .delete()
+        .eq('project_id', resolvedParams.id)
+        .eq('option_type', optionType)
+        .eq('option_value', optionValue)
+
+      if (error) throw error
+      return true
+    } catch (error) {
+      console.error(`Error deleting custom ${optionType} option:`, error)
+      return false
     }
   }
 
@@ -606,9 +661,15 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                   <span className="text-lg sm:text-xl md:text-2xl font-bold text-white">{bugs.length}</span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20">
-                  <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Open Bugs:</span>
+                  <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Opened Bugs:</span>
                   <span className="text-lg sm:text-xl md:text-2xl font-bold text-red-400">
-                    {bugs.filter(bug => bug.status.toLowerCase() === 'open' || bug.status.toLowerCase() === 'reopened').length}
+                    {bugs.filter(bug => bug.status.toLowerCase() === 'open').length}
+                  </span>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20">
+                  <span className="text-xs sm:text-sm md:text-base text-gray-300 font-medium">Reopened Bugs:</span>
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-orange-400">
+                    {bugs.filter(bug => bug.status.toLowerCase() === 'reopened').length}
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-white/20">
@@ -853,10 +914,12 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                       <div key={option} className="flex justify-between items-center px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-white text-sm">
                         <span>{option}</span>
                         <button
-                          onClick={() => {
-                            const newOptions = customPortalOptions.filter(o => o !== option)
-                            setCustomPortalOptions(newOptions)
-                            localStorage.setItem(`custom_portal_options_${resolvedParams.id}`, JSON.stringify(newOptions))
+                          onClick={async () => {
+                            const success = await deleteCustomOption('portal', option)
+                            if (success) {
+                              const newOptions = customPortalOptions.filter(o => o !== option)
+                              setCustomPortalOptions(newOptions)
+                            }
                           }}
                           className="text-red-400 hover:text-red-300 font-medium text-xs"
                         >
@@ -870,27 +933,31 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
                       type="text"
                       placeholder="Add new portal option"
                       className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e316d] focus:border-transparent text-white placeholder-gray-400 text-sm"
-                      onKeyDown={(e) => {
+                      onKeyDown={async (e) => {
                         if (e.key === 'Enter') {
                           const value = e.currentTarget.value.trim()
                           if (value && !DEFAULT_PORTAL_OPTIONS.includes(value) && !customPortalOptions.includes(value)) {
-                            const newOptions = [...customPortalOptions, value]
-                            setCustomPortalOptions(newOptions)
-                            localStorage.setItem(`custom_portal_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                            e.currentTarget.value = ''
+                            const success = await saveCustomOption('portal', value)
+                            if (success) {
+                              const newOptions = [...customPortalOptions, value]
+                              setCustomPortalOptions(newOptions)
+                              e.currentTarget.value = ''
+                            }
                           }
                         }
                       }}
                     />
                     <button
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         const input = e.currentTarget.previousElementSibling as HTMLInputElement
                         const value = input.value.trim()
                         if (value && !DEFAULT_PORTAL_OPTIONS.includes(value) && !customPortalOptions.includes(value)) {
-                          const newOptions = [...customPortalOptions, value]
-                          setCustomPortalOptions(newOptions)
-                          localStorage.setItem(`custom_portal_options_${resolvedParams.id}`, JSON.stringify(newOptions))
-                          input.value = ''
+                          const success = await saveCustomOption('portal', value)
+                          if (success) {
+                            const newOptions = [...customPortalOptions, value]
+                            setCustomPortalOptions(newOptions)
+                            input.value = ''
+                          }
                         }
                       }}
                       className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
